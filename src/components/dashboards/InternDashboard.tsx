@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -16,13 +15,11 @@ import {
   BookOpen,
   TrendingUp,
   Calendar,
-  Award,
-  Building2,
-  MapPin,
-  Clock,
-  Star
+  Award
 } from "lucide-react";
 import DashboardLayout from "@/components/layout/DashboardLayout";
+import ApplicationTracker from "@/components/intern/ApplicationTracker";
+import SkillAssessment from "@/components/intern/SkillAssessment";
 import { useAuthStore } from "@/stores/authStore";
 
 const InternDashboard = () => {
@@ -244,6 +241,10 @@ const InternDashboard = () => {
         return renderOverview();
       case "profile":
         return renderProfile();
+      case "applications":
+        return <ApplicationTracker />;
+      case "skills":
+        return <SkillAssessment />;
       default:
         return (
           <Card>

@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -23,6 +22,7 @@ import {
 } from "lucide-react";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import { useAuthStore } from "@/stores/authStore";
+import UserManagement from "@/components/admin/UserManagement";
 
 const AdminDashboard = () => {
   const { user } = useAuthStore();
@@ -284,7 +284,7 @@ const AdminDashboard = () => {
       case "overview":
         return renderOverview();
       case "users":
-        return renderUserManagement();
+        return <UserManagement />;
       default:
         return (
           <Card>

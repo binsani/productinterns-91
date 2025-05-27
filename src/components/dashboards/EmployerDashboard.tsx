@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -13,14 +12,10 @@ import {
   Calendar,
   TrendingUp,
   CreditCard,
-  BarChart3,
-  Eye,
-  UserCheck,
-  Clock,
-  Star,
-  MapPin
+  BarChart3
 } from "lucide-react";
 import DashboardLayout from "@/components/layout/DashboardLayout";
+import ApplicantManagement from "@/components/employer/ApplicantManagement";
 import { useAuthStore } from "@/stores/authStore";
 
 const EmployerDashboard = () => {
@@ -302,6 +297,8 @@ const EmployerDashboard = () => {
         return renderOverview();
       case "company":
         return renderCompanyProfile();
+      case "applicants":
+        return <ApplicantManagement />;
       default:
         return (
           <Card>
