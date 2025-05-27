@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -15,7 +16,10 @@ import {
   BookOpen,
   TrendingUp,
   Calendar,
-  Award
+  Award,
+  Building2,
+  MapPin,
+  Clock
 } from "lucide-react";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import ApplicationTracker from "@/components/intern/ApplicationTracker";
