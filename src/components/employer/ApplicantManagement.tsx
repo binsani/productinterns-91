@@ -23,7 +23,9 @@ import {
   CheckCircle,
   X,
   Clock,
-  GraduationCap
+  GraduationCap,
+  MapPin,
+  UserCheck
 } from "lucide-react";
 
 interface Applicant {
