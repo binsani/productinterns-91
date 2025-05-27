@@ -96,7 +96,7 @@ const ApplicantManagement = () => {
       match: 91,
       avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=michael"
     }
-  ];
+  ]);
 
   const getStatusColor = (status: string) => {
     switch (status) {
