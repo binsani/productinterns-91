@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -22,10 +21,12 @@ import {
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import ApplicantManagement from "@/components/employer/ApplicantManagement";
 import { useAuthStore } from "@/stores/authStore";
+import JobPostingModal from "@/components/employer/JobPostingModal";
 
 const EmployerDashboard = () => {
   const { user } = useAuthStore();
   const [activeTab, setActiveTab] = useState("overview");
+  const [isJobPostingModalOpen, setIsJobPostingModalOpen] = useState(false);
 
   const navigationItems = [
     { id: "overview", label: "Overview", icon: TrendingUp },
@@ -105,7 +106,7 @@ const EmployerDashboard = () => {
             <CardTitle>Active Job Postings</CardTitle>
             <CardDescription>Manage your current internship listings</CardDescription>
           </div>
-          <Button>
+          <Button onClick={() => setIsJobPostingModalOpen(true)}>
             <Plus className="h-4 w-4 mr-2" />
             Post New Job
           </Button>
@@ -320,14 +321,21 @@ const EmployerDashboard = () => {
   };
 
   return (
-    <DashboardLayout
-      title="Employer Dashboard"
-      navigationItems={navigationItems}
-      activeTab={activeTab}
-      onTabChange={setActiveTab}
-    >
-      {renderContent()}
-    </DashboardLayout>
+    <>
+      <DashboardLayout
+        title="Employer Dashboard"
+        navigationItems={navigationItems}
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+      >
+        {renderContent()}
+      </DashboardLayout>
+      
+      <JobPostingModal 
+        isOpen={isJobPostingModalOpen} 
+        onClose={() => setIsJobPostingModalOpen(false)} 
+      />
+    </>
   );
 };
 
