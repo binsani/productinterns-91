@@ -22,6 +22,10 @@ import DashboardLayout from "@/components/layout/DashboardLayout";
 import ApplicantManagement from "@/components/employer/ApplicantManagement";
 import { useAuthStore } from "@/stores/authStore";
 import JobPostingModal from "@/components/employer/JobPostingModal";
+import JobPostingsManagement from "@/components/employer/JobPostingsManagement";
+import InterviewScheduling from "@/components/employer/InterviewScheduling";
+import AnalyticsReporting from "@/components/employer/AnalyticsReporting";
+import BillingManagement from "@/components/employer/BillingManagement";
 
 const EmployerDashboard = () => {
   const { user } = useAuthStore();
@@ -303,8 +307,16 @@ const EmployerDashboard = () => {
         return renderOverview();
       case "company":
         return renderCompanyProfile();
+      case "postings":
+        return <JobPostingsManagement />;
       case "applicants":
         return <ApplicantManagement />;
+      case "interviews":
+        return <InterviewScheduling />;
+      case "analytics":
+        return <AnalyticsReporting />;
+      case "billing":
+        return <BillingManagement />;
       default:
         return (
           <Card>
