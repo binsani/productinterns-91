@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -18,6 +17,15 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { 
   Search, 
   MoreHorizontal, 
@@ -28,7 +36,8 @@ import {
   Users,
   Building2,
   UserCheck,
-  UserX
+  UserX,
+  Plus
 } from "lucide-react";
 
 interface User {
@@ -50,8 +59,15 @@ const UserManagement = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [roleFilter, setRoleFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [isAddingUser, setIsAddingUser] = useState(false);
+  const [newUser, setNewUser] = useState({
+    name: "",
+    email: "",
+    role: "intern" as const,
+    companyName: ""
+  });
 
-  const [users] = useState<User[]>([
+  const [users, setUsers] = useState<User[]>([
     {
       id: "1",
       name: "Alex Johnson",
@@ -103,6 +119,48 @@ const UserManagement = () => {
       postings: 3
     }
   ]);
+
+  const handleAddUser = async () => {
+    if (!newUser.name.trim() || !newUser.email.trim()) {
+      alert("Please fill in name and email");
+      return;
+    }
+
+    if (users.some(user => user.email === newUser.email)) {
+      alert("User with this email already exists");
+      return;
+    }
+
+    setIsAddingUser(true);
+    try {
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      const user: User = {
+        id: String(users.length + 1),
+        name: newUser.name,
+        email: newUser.email,
+        role: newUser.role,
+        status: "pending",
+        joinDate: new Date().toISOString().split('T')[0],
+        lastActive: "Just now",
+        avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${newUser.email}`,
+        verified: false,
+        companyName: newUser.role === "employer" ? newUser.companyName : undefined,
+        applications: newUser.role === "intern" ? 0 : undefined,
+        postings: newUser.role === "employer" ? 0 : undefined
+      };
+
+      setUsers(prev => [...prev, user]);
+      setNewUser({ name: "", email: "", role: "intern", companyName: "" });
+      console.log("New user added:", user);
+      alert("User added successfully!");
+    } catch (error) {
+      console.error("Failed to add user:", error);
+      alert("Failed to add user. Please try again.");
+    } finally {
+      setIsAddingUser(false);
+    }
+  };
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -200,8 +258,85 @@ const UserManagement = () => {
       {/* User Management */}
       <Card>
         <CardHeader>
-          <CardTitle>User Management</CardTitle>
-          <CardDescription>Manage platform users and their permissions</CardDescription>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle>User Management</CardTitle>
+              <CardDescription>Manage platform users and their permissions</CardDescription>
+            </div>
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button className="flex items-center space-x-2">
+                  <Plus className="h-4 w-4" />
+                  <span>Add New User</span>
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="bg-white">
+                <DialogHeader>
+                  <DialogTitle>Add New User</DialogTitle>
+                  <DialogDescription>
+                    Create a new user account for the platform
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="space-y-4">
+                  <div>
+                    <label className="text-sm font-medium">Name</label>
+                    <Input
+                      placeholder="Enter full name"
+                      value={newUser.name}
+                      onChange={(e) => setNewUser(prev => ({ ...prev, name: e.target.value }))}
+                    />
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium">Email</label>
+                    <Input
+                      type="email"
+                      placeholder="Enter email address"
+                      value={newUser.email}
+                      onChange={(e) => setNewUser(prev => ({ ...prev, email: e.target.value }))}
+                    />
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium">Role</label>
+                    <Select 
+                      value={newUser.role} 
+                      onValueChange={(value: "intern" | "employer" | "admin") => 
+                        setNewUser(prev => ({ ...prev, role: value }))
+                      }
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="bg-white">
+                        <SelectItem value="intern">Intern</SelectItem>
+                        <SelectItem value="employer">Employer</SelectItem>
+                        <SelectItem value="admin">Admin</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  {newUser.role === "employer" && (
+                    <div>
+                      <label className="text-sm font-medium">Company Name</label>
+                      <Input
+                        placeholder="Enter company name"
+                        value={newUser.companyName}
+                        onChange={(e) => setNewUser(prev => ({ ...prev, companyName: e.target.value }))}
+                      />
+                    </div>
+                  )}
+                </div>
+                <DialogFooter>
+                  <Button 
+                    onClick={handleAddUser}
+                    disabled={isAddingUser}
+                    className="flex items-center space-x-2"
+                  >
+                    <Plus className="h-4 w-4" />
+                    <span>{isAddingUser ? "Adding..." : "Add User"}</span>
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+          </div>
         </CardHeader>
         <CardContent>
           {/* Filters */}

@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -28,6 +27,7 @@ import Analytics from "@/components/admin/Analytics";
 import ContentModeration from "@/components/admin/ContentModeration";
 import Support from "@/components/admin/Support";
 import PlatformSettings from "@/components/admin/PlatformSettings";
+import Subscriptions from "@/components/admin/Subscriptions";
 
 const AdminDashboard = () => {
   const { user } = useAuthStore();
@@ -294,6 +294,8 @@ const AdminDashboard = () => {
         return <Analytics />;
       case "content":
         return <ContentModeration />;
+      case "billing":
+        return <Subscriptions />;
       case "support":
         return <Support />;
       case "settings":
