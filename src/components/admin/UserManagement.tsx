@@ -55,15 +55,22 @@ interface User {
   postings?: number;
 }
 
+interface NewUser {
+  name: string;
+  email: string;
+  role: "intern" | "employer" | "admin";
+  companyName: string;
+}
+
 const UserManagement = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [roleFilter, setRoleFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
   const [isAddingUser, setIsAddingUser] = useState(false);
-  const [newUser, setNewUser] = useState({
+  const [newUser, setNewUser] = useState<NewUser>({
     name: "",
     email: "",
-    role: "intern" as const,
+    role: "intern",
     companyName: ""
   });
 
