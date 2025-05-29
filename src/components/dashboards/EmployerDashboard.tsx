@@ -26,6 +26,10 @@ import JobPostingsManagement from "@/components/employer/JobPostingsManagement";
 import InterviewScheduling from "@/components/employer/InterviewScheduling";
 import AnalyticsReporting from "@/components/employer/AnalyticsReporting";
 import BillingManagement from "@/components/employer/BillingManagement";
+import StatsCard from "@/components/shared/StatsCard";
+import WelcomeHero from "@/components/shared/WelcomeHero";
+import JobCard from "@/components/shared/JobCard";
+import ApplicationCard from "@/components/shared/ApplicationCard";
 
 const EmployerDashboard = () => {
   const { user } = useAuthStore();
@@ -43,64 +47,55 @@ const EmployerDashboard = () => {
     { id: "billing", label: "Billing", icon: CreditCard },
   ];
 
+  const handleJobView = (id: number) => {
+    setActiveTab("applicants");
+  };
+
+  const handleJobEdit = (id: number) => {
+    console.log("Edit job:", id);
+  };
+
+  const handleApplicantReview = (id: number, name: string) => {
+    console.log("Review applicant:", id, name);
+  };
+
   const renderOverview = () => (
     <div className="space-y-6">
       {/* Welcome Section */}
-      <div className="bg-gradient-to-r from-green-600 to-blue-600 rounded-lg p-6 text-white">
-        <div className="flex items-center space-x-4">
-          <Avatar className="h-16 w-16 border-4 border-white/20">
-            <AvatarImage src={user?.avatar} alt={user?.name} />
-            <AvatarFallback>{user?.name?.charAt(0)}</AvatarFallback>
-          </Avatar>
-          <div>
-            <h2 className="text-2xl font-bold">Welcome, {user?.name}!</h2>
-            <p className="text-green-100">Find the perfect product management interns for {user?.companyName}</p>
-          </div>
-        </div>
-      </div>
+      <WelcomeHero
+        name={user?.name || "User"}
+        avatar={user?.avatar}
+        title={`Welcome, ${user?.name}!`}
+        subtitle={`Find the perfect product management interns for ${user?.companyName}`}
+        gradient="from-green-600 to-blue-600"
+      />
 
       {/* Quick Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Active Postings</CardTitle>
-            <Plus className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">5</div>
-            <p className="text-xs text-muted-foreground">2 expiring soon</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Applications</CardTitle>
-            <FileText className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">47</div>
-            <p className="text-xs text-muted-foreground">+12 this week</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Interviews</CardTitle>
-            <Calendar className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">8</div>
-            <p className="text-xs text-muted-foreground">3 today</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Hired</CardTitle>
-            <UserCheck className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">12</div>
-            <p className="text-xs text-muted-foreground">This quarter</p>
-          </CardContent>
-        </Card>
+        <StatsCard
+          title="Active Postings"
+          value="5"
+          change="2 expiring soon"
+          icon={Plus}
+        />
+        <StatsCard
+          title="Applications"
+          value="47"
+          change="+12 this week"
+          icon={FileText}
+        />
+        <StatsCard
+          title="Interviews"
+          value="8"
+          change="3 today"
+          icon={Calendar}
+        />
+        <StatsCard
+          title="Hired"
+          value="12"
+          change="This quarter"
+          icon={UserCheck}
+        />
       </div>
 
       {/* Active Job Postings */}
@@ -119,6 +114,7 @@ const EmployerDashboard = () => {
           <div className="space-y-4">
             {[
               { 
+                id: 1,
                 title: "Product Management Intern", 
                 applications: 15, 
                 views: 245, 
@@ -127,6 +123,7 @@ const EmployerDashboard = () => {
                 location: "San Francisco, CA"
               },
               { 
+                id: 2,
                 title: "Junior PM Intern - Summer 2024", 
                 applications: 23, 
                 views: 187, 
@@ -135,6 +132,7 @@ const EmployerDashboard = () => {
                 location: "Remote"
               },
               { 
+                id: 3,
                 title: "Associate Product Manager Intern", 
                 applications: 9, 
                 views: 156, 
@@ -142,27 +140,21 @@ const EmployerDashboard = () => {
                 status: "Active",
                 location: "New York, NY"
               },
-            ].map((job, index) => (
-              <div key={index} className="flex items-center justify-between p-4 border rounded-lg">
-                <div className="flex-1">
-                  <div className="flex items-center space-x-2 mb-1">
-                    <h3 className="font-semibold">{job.title}</h3>
-                    <Badge variant="outline" className="text-green-600 border-green-600">
-                      {job.status}
-                    </Badge>
-                  </div>
-                  <div className="flex items-center space-x-4 text-sm text-gray-600">
-                    <span className="flex items-center"><MapPin className="h-3 w-3 mr-1" />{job.location}</span>
-                    <span className="flex items-center"><Eye className="h-3 w-3 mr-1" />{job.views} views</span>
-                    <span className="flex items-center"><Users className="h-3 w-3 mr-1" />{job.applications} applications</span>
-                    <span className="flex items-center"><Clock className="h-3 w-3 mr-1" />Posted {job.posted}</span>
-                  </div>
-                </div>
-                <div className="flex space-x-2">
-                  <Button variant="outline" size="sm">View Applications</Button>
-                  <Button variant="outline" size="sm">Edit</Button>
-                </div>
-              </div>
+            ].map((job) => (
+              <JobCard
+                key={job.id}
+                id={job.id}
+                title={job.title}
+                location={job.location}
+                type="Full-time"
+                applications={job.applications}
+                views={job.views}
+                posted={job.posted}
+                status={job.status}
+                onView={handleJobView}
+                onEdit={handleJobEdit}
+                variant="posting"
+              />
             ))}
           </div>
         </CardContent>
@@ -178,6 +170,7 @@ const EmployerDashboard = () => {
           <div className="space-y-4">
             {[
               { 
+                id: 1,
                 name: "Alex Johnson", 
                 position: "Product Management Intern", 
                 university: "Stanford University",
@@ -186,6 +179,7 @@ const EmployerDashboard = () => {
                 match: 94
               },
               { 
+                id: 2,
                 name: "Sarah Chen", 
                 position: "Junior PM Intern", 
                 university: "UC Berkeley",
@@ -194,6 +188,7 @@ const EmployerDashboard = () => {
                 match: 87
               },
               { 
+                id: 3,
                 name: "Michael Rodriguez", 
                 position: "Associate PM Intern", 
                 university: "MIT",
@@ -201,31 +196,19 @@ const EmployerDashboard = () => {
                 applied: "2 days ago",
                 match: 91
               },
-            ].map((applicant, index) => (
-              <div key={index} className="flex items-center justify-between p-4 border rounded-lg">
-                <div className="flex items-center space-x-4">
-                  <Avatar>
-                    <AvatarImage src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${applicant.name}`} />
-                    <AvatarFallback>{applicant.name.charAt(0)}</AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <div className="flex items-center space-x-2 mb-1">
-                      <h3 className="font-semibold">{applicant.name}</h3>
-                      <Badge className="bg-blue-100 text-blue-800">{applicant.match}% match</Badge>
-                    </div>
-                    <p className="text-sm text-gray-600">{applicant.university} • Applied to {applicant.position}</p>
-                    <div className="flex space-x-1 mt-1">
-                      {applicant.skills.slice(0, 3).map((skill) => (
-                        <Badge key={skill} variant="secondary" className="text-xs">{skill}</Badge>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <span className="text-sm text-gray-500">{applicant.applied}</span>
-                  <Button size="sm">Review</Button>
-                </div>
-              </div>
+            ].map((applicant) => (
+              <ApplicationCard
+                key={applicant.id}
+                id={applicant.id}
+                name={applicant.name}
+                position={applicant.position}
+                university={applicant.university}
+                skills={applicant.skills}
+                applied={applicant.applied}
+                match={applicant.match}
+                onReview={handleApplicantReview}
+                variant="applicant"
+              />
             ))}
           </div>
         </CardContent>

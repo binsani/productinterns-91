@@ -19,6 +19,10 @@ import StatsCards from "@/components/intern/StatsCards";
 import RecentApplications from "@/components/intern/RecentApplications";
 import RecommendedJobs from "@/components/intern/RecommendedJobs";
 import ProfileSection from "@/components/intern/ProfileSection";
+import InternshipBrowser from "@/components/intern/InternshipBrowser";
+import SavedJobs from "@/components/intern/SavedJobs";
+import Messages from "@/components/intern/Messages";
+import Learning from "@/components/intern/Learning";
 
 const InternDashboard = () => {
   const [activeTab, setActiveTab] = useState("overview");
@@ -49,10 +53,18 @@ const InternDashboard = () => {
         return renderOverview();
       case "profile":
         return <ProfileSection />;
+      case "internships":
+        return <InternshipBrowser />;
       case "applications":
         return <ApplicationTracker />;
+      case "saved":
+        return <SavedJobs />;
       case "skills":
         return <SkillAssessment />;
+      case "messages":
+        return <Messages />;
+      case "learning":
+        return <Learning />;
       default:
         return (
           <Card>
