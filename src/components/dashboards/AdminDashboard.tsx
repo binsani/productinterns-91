@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -23,6 +24,10 @@ import {
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import { useAuthStore } from "@/stores/authStore";
 import UserManagement from "@/components/admin/UserManagement";
+import Analytics from "@/components/admin/Analytics";
+import ContentModeration from "@/components/admin/ContentModeration";
+import Support from "@/components/admin/Support";
+import PlatformSettings from "@/components/admin/PlatformSettings";
 
 const AdminDashboard = () => {
   const { user } = useAuthStore();
@@ -285,6 +290,14 @@ const AdminDashboard = () => {
         return renderOverview();
       case "users":
         return <UserManagement />;
+      case "analytics":
+        return <Analytics />;
+      case "content":
+        return <ContentModeration />;
+      case "support":
+        return <Support />;
+      case "settings":
+        return <PlatformSettings />;
       default:
         return (
           <Card>
