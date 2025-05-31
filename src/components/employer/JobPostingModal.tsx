@@ -40,9 +40,9 @@ const JobPostingModal = ({ isOpen, onClose }: JobPostingModalProps) => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Simulate job posting
+    // Simulate internship posting
     toast({
-      title: "Job Posted Successfully!",
+      title: "PM Internship Posted Successfully!",
       description: `${formData.title} has been posted and is now live.`,
     });
     
@@ -66,15 +66,15 @@ const JobPostingModal = ({ isOpen, onClose }: JobPostingModalProps) => {
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[600px] bg-white">
         <DialogHeader>
-          <DialogTitle>Post New Internship</DialogTitle>
+          <DialogTitle>Post New PM Internship</DialogTitle>
           <DialogDescription>
-            Create a new internship posting to attract top talent.
+            Create a new product management internship posting to attract top talent.
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="title">Job Title</Label>
+              <Label htmlFor="title">Internship Title</Label>
               <Input
                 id="title"
                 value={formData.title}
@@ -97,15 +97,14 @@ const JobPostingModal = ({ isOpen, onClose }: JobPostingModalProps) => {
           
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="type">Employment Type</Label>
+              <Label htmlFor="type">Internship Type</Label>
               <Select value={formData.type} onValueChange={(value) => handleChange("type", value)}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select type" />
                 </SelectTrigger>
                 <SelectContent className="bg-white">
-                  <SelectItem value="internship">Internship</SelectItem>
-                  <SelectItem value="part-time">Part-time</SelectItem>
                   <SelectItem value="full-time">Full-time</SelectItem>
+                  <SelectItem value="part-time">Part-time</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -125,12 +124,12 @@ const JobPostingModal = ({ isOpen, onClose }: JobPostingModalProps) => {
           </div>
 
           <div>
-            <Label htmlFor="description">Job Description</Label>
+            <Label htmlFor="description">Internship Description</Label>
             <Textarea
               id="description"
               value={formData.description}
               onChange={(e) => handleChange("description", e.target.value)}
-              placeholder="Describe the role, responsibilities, and what the intern will learn..."
+              placeholder="Describe the PM role, responsibilities, and what the intern will learn in product management..."
               rows={4}
               required
             />
@@ -142,7 +141,7 @@ const JobPostingModal = ({ isOpen, onClose }: JobPostingModalProps) => {
               id="requirements"
               value={formData.requirements}
               onChange={(e) => handleChange("requirements", e.target.value)}
-              placeholder="List the required skills, education, and experience..."
+              placeholder="List required skills for product management, education background, and experience..."
               rows={3}
               required
             />
@@ -152,7 +151,7 @@ const JobPostingModal = ({ isOpen, onClose }: JobPostingModalProps) => {
             <Button type="button" variant="outline" onClick={onClose}>
               Cancel
             </Button>
-            <Button type="submit">Post Job</Button>
+            <Button type="submit">Post PM Internship</Button>
           </DialogFooter>
         </form>
       </DialogContent>

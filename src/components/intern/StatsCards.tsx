@@ -17,13 +17,13 @@ const StatsCards = () => {
       icon: Calendar
     },
     {
-      title: "Skill Score",
+      title: "PM Skill Score",
       value: "85%", 
       change: "+5% from last test",
       icon: Award
     },
     {
-      title: "Saved Jobs",
+      title: "Saved PM Internships",
       value: "8",
       change: "3 new matches", 
       icon: Bookmark

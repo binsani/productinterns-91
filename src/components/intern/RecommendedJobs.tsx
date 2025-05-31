@@ -6,10 +6,10 @@ import JobCard from "@/components/shared/JobCard";
 
 const RecommendedJobs = () => {
   const { toast } = useToast();
-  const [savedJobs, setSavedJobs] = useState<Set<number>>(new Set());
-  const [appliedJobs, setAppliedJobs] = useState<Set<number>>(new Set());
+  const [savedInternships, setSavedInternships] = useState<Set<number>>(new Set());
+  const [appliedInternships, setAppliedInternships] = useState<Set<number>>(new Set());
 
-  const jobs = [
+  const internships = [
     { 
       id: 1,
       company: "InnovateTech", 
@@ -30,29 +30,29 @@ const RecommendedJobs = () => {
     },
   ];
 
-  const handleApply = (jobId: number, position: string, company: string = "") => {
-    setAppliedJobs(prev => new Set([...prev, jobId]));
+  const handleApply = (internshipId: number, position: string, company: string = "") => {
+    setAppliedInternships(prev => new Set([...prev, internshipId]));
     toast({
       title: "Application Submitted!",
       description: `Your application for ${position} at ${company} has been submitted successfully.`,
     });
   };
 
-  const handleSave = (jobId: number, position: string, company: string = "") => {
-    if (savedJobs.has(jobId)) {
-      setSavedJobs(prev => {
+  const handleSave = (internshipId: number, position: string, company: string = "") => {
+    if (savedInternships.has(internshipId)) {
+      setSavedInternships(prev => {
         const newSet = new Set(prev);
-        newSet.delete(jobId);
+        newSet.delete(internshipId);
         return newSet;
       });
       toast({
-        title: "Job Removed",
-        description: `${position} at ${company} has been removed from your saved jobs.`,
+        title: "Internship Removed",
+        description: `${position} at ${company} has been removed from your saved internships.`,
       });
     } else {
-      setSavedJobs(prev => new Set([...prev, jobId]));
+      setSavedInternships(prev => new Set([...prev, internshipId]));
       toast({
-        title: "Job Saved!",
+        title: "Internship Saved!",
         description: `${position} at ${company} has been saved to your favorites.`,
       });
     }
@@ -61,25 +61,25 @@ const RecommendedJobs = () => {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Recommended for You</CardTitle>
-        <CardDescription>Internships matching your profile and preferences</CardDescription>
+        <CardTitle>Recommended Product Management Internships</CardTitle>
+        <CardDescription>PM internships matching your profile and preferences</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {jobs.map((job) => (
+          {internships.map((internship) => (
             <JobCard
-              key={job.id}
-              id={job.id}
-              title={job.title}
-              company={job.company}
-              location={job.location}
-              type={job.type}
-              match={job.match}
-              description={job.description}
+              key={internship.id}
+              id={internship.id}
+              title={internship.title}
+              company={internship.company}
+              location={internship.location}
+              type={internship.type}
+              match={internship.match}
+              description={internship.description}
               onApply={handleApply}
               onSave={handleSave}
-              isApplied={appliedJobs.has(job.id)}
-              isSaved={savedJobs.has(job.id)}
+              isApplied={appliedInternships.has(internship.id)}
+              isSaved={savedInternships.has(internship.id)}
               variant="recommendation"
             />
           ))}

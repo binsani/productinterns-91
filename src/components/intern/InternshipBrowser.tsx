@@ -10,11 +10,11 @@ import { useToast } from "@/hooks/use-toast";
 
 const InternshipBrowser = () => {
   const [searchQuery, setSearchQuery] = useState("");
-  const [savedJobs, setSavedJobs] = useState<number[]>([]);
-  const [appliedJobs, setAppliedJobs] = useState<number[]>([]);
+  const [savedInternships, setSavedInternships] = useState<number[]>([]);
+  const [appliedInternships, setAppliedInternships] = useState<number[]>([]);
   const { toast } = useToast();
 
-  const mockJobs = [
+  const pmInternships = [
     {
       id: 1,
       title: "Product Management Intern",
@@ -54,7 +54,7 @@ const InternshipBrowser = () => {
   ];
 
   const handleApply = (id: number, title: string, company?: string) => {
-    setAppliedJobs(prev => [...prev, id]);
+    setAppliedInternships(prev => [...prev, id]);
     toast({
       title: "Application Submitted",
       description: `Your application for ${title} at ${company} has been submitted successfully.`,
@@ -62,16 +62,16 @@ const InternshipBrowser = () => {
   };
 
   const handleSave = (id: number, title: string, company?: string) => {
-    if (savedJobs.includes(id)) {
-      setSavedJobs(prev => prev.filter(jobId => jobId !== id));
+    if (savedInternships.includes(id)) {
+      setSavedInternships(prev => prev.filter(internshipId => internshipId !== id));
       toast({
-        title: "Job Removed",
-        description: `${title} at ${company} has been removed from your saved jobs.`,
+        title: "Internship Removed",
+        description: `${title} at ${company} has been removed from your saved internships.`,
       });
     } else {
-      setSavedJobs(prev => [...prev, id]);
+      setSavedInternships(prev => [...prev, id]);
       toast({
-        title: "Job Saved",
+        title: "Internship Saved",
         description: `${title} at ${company} has been saved to your favorites.`,
       });
     }
@@ -81,7 +81,7 @@ const InternshipBrowser = () => {
     <div className="space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle>Find Your Perfect Internship</CardTitle>
+          <CardTitle>Find Your Perfect PM Internship</CardTitle>
           <CardDescription>Browse and apply to product management internships</CardDescription>
         </CardHeader>
         <CardContent>
@@ -89,7 +89,7 @@ const InternshipBrowser = () => {
             <div className="flex-1 relative">
               <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
               <Input
-                placeholder="Search internships..."
+                placeholder="Search PM internships..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-10"
@@ -102,20 +102,20 @@ const InternshipBrowser = () => {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {mockJobs.map((job) => (
+            {pmInternships.map((internship) => (
               <JobCard
-                key={job.id}
-                id={job.id}
-                title={job.title}
-                company={job.company}
-                location={job.location}
-                type={job.type}
-                match={job.match}
-                description={job.description}
+                key={internship.id}
+                id={internship.id}
+                title={internship.title}
+                company={internship.company}
+                location={internship.location}
+                type={internship.type}
+                match={internship.match}
+                description={internship.description}
                 onApply={handleApply}
                 onSave={handleSave}
-                isApplied={appliedJobs.includes(job.id)}
-                isSaved={savedJobs.includes(job.id)}
+                isApplied={appliedInternships.includes(internship.id)}
+                isSaved={savedInternships.includes(internship.id)}
                 variant="recommendation"
               />
             ))}

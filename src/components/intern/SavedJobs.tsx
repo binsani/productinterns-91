@@ -8,11 +8,11 @@ import JobCard from "@/components/shared/JobCard";
 import { useToast } from "@/hooks/use-toast";
 
 const SavedJobs = () => {
-  const [savedJobs, setSavedJobs] = useState([1, 2, 3]);
-  const [appliedJobs, setAppliedJobs] = useState<number[]>([]);
+  const [savedInternships, setSavedInternships] = useState([1, 2, 3]);
+  const [appliedInternships, setAppliedInternships] = useState<number[]>([]);
   const { toast } = useToast();
 
-  const mockSavedJobs = [
+  const mockSavedInternships = [
     {
       id: 1,
       title: "Product Management Intern",
@@ -24,7 +24,7 @@ const SavedJobs = () => {
     },
     {
       id: 2,
-      title: "Associate Product Manager",
+      title: "Associate Product Manager Intern",
       company: "Slack",
       location: "San Francisco, CA", 
       type: "Full-time",
@@ -43,7 +43,7 @@ const SavedJobs = () => {
   ];
 
   const handleApply = (id: number, title: string, company?: string) => {
-    setAppliedJobs(prev => [...prev, id]);
+    setAppliedInternships(prev => [...prev, id]);
     toast({
       title: "Application Submitted",
       description: `Your application for ${title} at ${company} has been submitted successfully.`,
@@ -51,14 +51,14 @@ const SavedJobs = () => {
   };
 
   const handleRemove = (id: number, title: string, company?: string) => {
-    setSavedJobs(prev => prev.filter(jobId => jobId !== id));
+    setSavedInternships(prev => prev.filter(internshipId => internshipId !== id));
     toast({
-      title: "Job Removed",
-      description: `${title} at ${company} has been removed from your saved jobs.`,
+      title: "Internship Removed",
+      description: `${title} at ${company} has been removed from your saved internships.`,
     });
   };
 
-  const filteredJobs = mockSavedJobs.filter(job => savedJobs.includes(job.id));
+  const filteredInternships = mockSavedInternships.filter(internship => savedInternships.includes(internship.id));
 
   return (
     <div className="space-y-6">
@@ -68,35 +68,35 @@ const SavedJobs = () => {
             <div>
               <CardTitle className="flex items-center">
                 <Bookmark className="h-5 w-5 mr-2" />
-                Saved Jobs
+                Saved PM Internships
               </CardTitle>
-              <CardDescription>Your bookmarked internship opportunities</CardDescription>
+              <CardDescription>Your bookmarked product management internship opportunities</CardDescription>
             </div>
-            <Badge variant="secondary">{filteredJobs.length} saved</Badge>
+            <Badge variant="secondary">{filteredInternships.length} saved</Badge>
           </div>
         </CardHeader>
         <CardContent>
-          {filteredJobs.length === 0 ? (
+          {filteredInternships.length === 0 ? (
             <div className="text-center py-8">
               <Bookmark className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-600">No saved jobs yet</p>
-              <p className="text-sm text-gray-500 mt-1">Save interesting internships to review them later</p>
+              <p className="text-gray-600">No saved PM internships yet</p>
+              <p className="text-sm text-gray-500 mt-1">Save interesting product management internships to review them later</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 gap-4">
-              {filteredJobs.map((job) => (
-                <div key={job.id} className="border rounded-lg p-4">
+              {filteredInternships.map((internship) => (
+                <div key={internship.id} className="border rounded-lg p-4">
                   <div className="flex justify-between items-start mb-2">
                     <div className="flex-1">
                       <div className="flex justify-between items-start mb-2">
-                        <h3 className="font-semibold">{job.title}</h3>
-                        <Badge className="bg-green-100 text-green-800">{job.match}% match</Badge>
+                        <h3 className="font-semibold">{internship.title}</h3>
+                        <Badge className="bg-green-100 text-green-800">{internship.match}% match</Badge>
                       </div>
-                      <p className="text-blue-600 font-medium mb-2">{job.company}</p>
-                      <p className="text-sm text-gray-700 mb-3">{job.description}</p>
+                      <p className="text-blue-600 font-medium mb-2">{internship.company}</p>
+                      <p className="text-sm text-gray-700 mb-3">{internship.description}</p>
                       <div className="flex items-center space-x-4 text-sm text-gray-600 mb-3">
-                        <span>{job.location}</span>
-                        <span>{job.type}</span>
+                        <span>{internship.location}</span>
+                        <span>{internship.type}</span>
                       </div>
                     </div>
                   </div>
@@ -104,15 +104,15 @@ const SavedJobs = () => {
                     <Button 
                       size="sm" 
                       className="flex-1"
-                      onClick={() => handleApply(job.id, job.title, job.company)}
-                      disabled={appliedJobs.includes(job.id)}
+                      onClick={() => handleApply(internship.id, internship.title, internship.company)}
+                      disabled={appliedInternships.includes(internship.id)}
                     >
-                      {appliedJobs.includes(job.id) ? "Applied" : "Apply Now"}
+                      {appliedInternships.includes(internship.id) ? "Applied" : "Apply Now"}
                     </Button>
                     <Button 
                       size="sm" 
                       variant="outline"
-                      onClick={() => handleRemove(job.id, job.title, job.company)}
+                      onClick={() => handleRemove(internship.id, internship.title, internship.company)}
                     >
                       <Trash2 className="h-4 w-4 mr-1" />
                       Remove

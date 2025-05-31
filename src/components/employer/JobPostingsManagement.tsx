@@ -30,7 +30,7 @@ const JobPostingsManagement = () => {
   const { toast } = useToast();
   const [isJobPostingModalOpen, setIsJobPostingModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-  const [jobPostings, setJobPostings] = useState([
+  const [internshipPostings, setInternshipPostings] = useState([
     { 
       id: 1,
       title: "Product Management Intern", 
@@ -46,7 +46,7 @@ const JobPostingsManagement = () => {
       id: 2,
       title: "Junior PM Intern - Summer 2024", 
       location: "Remote",
-      type: "Internship",
+      type: "Full-time",
       applications: 23, 
       views: 187, 
       posted: "2024-01-08",
@@ -66,28 +66,28 @@ const JobPostingsManagement = () => {
     },
   ]);
 
-  const filteredJobs = jobPostings.filter(job =>
-    job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    job.location.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredInternships = internshipPostings.filter(internship =>
+    internship.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    internship.location.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const handleDeleteJob = (jobId: number, jobTitle: string) => {
-    setJobPostings(prev => prev.filter(job => job.id !== jobId));
+  const handleDeleteInternship = (internshipId: number, internshipTitle: string) => {
+    setInternshipPostings(prev => prev.filter(internship => internship.id !== internshipId));
     toast({
-      title: "Job Deleted",
-      description: `${jobTitle} has been deleted successfully.`,
+      title: "PM Internship Deleted",
+      description: `${internshipTitle} has been deleted successfully.`,
     });
   };
 
-  const handleToggleStatus = (jobId: number) => {
-    setJobPostings(prev => prev.map(job => 
-      job.id === jobId 
-        ? { ...job, status: job.status === "Active" ? "Paused" : "Active" }
-        : job
+  const handleToggleStatus = (internshipId: number) => {
+    setInternshipPostings(prev => prev.map(internship => 
+      internship.id === internshipId 
+        ? { ...internship, status: internship.status === "Active" ? "Paused" : "Active" }
+        : internship
     ));
     toast({
       title: "Status Updated",
-      description: "Job posting status has been updated.",
+      description: "PM internship posting status has been updated.",
     });
   };
 
@@ -106,12 +106,12 @@ const JobPostingsManagement = () => {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
             <div>
-              <CardTitle>Job Postings Management</CardTitle>
-              <CardDescription>Manage all your job postings and track their performance</CardDescription>
+              <CardTitle>PM Internship Postings Management</CardTitle>
+              <CardDescription>Manage all your product management internship postings and track their performance</CardDescription>
             </div>
             <Button onClick={() => setIsJobPostingModalOpen(true)}>
               <Plus className="h-4 w-4 mr-2" />
-              Post New Job
+              Post New PM Internship
             </Button>
           </CardHeader>
           <CardContent>
@@ -119,7 +119,7 @@ const JobPostingsManagement = () => {
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                 <Input
-                  placeholder="Search job postings..."
+                  placeholder="Search PM internship postings..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-10"
@@ -130,7 +130,7 @@ const JobPostingsManagement = () => {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Job Title</TableHead>
+                  <TableHead>PM Internship Title</TableHead>
                   <TableHead>Location</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead>Applications</TableHead>
@@ -140,41 +140,41 @@ const JobPostingsManagement = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredJobs.map((job) => (
-                  <TableRow key={job.id}>
+                {filteredInternships.map((internship) => (
+                  <TableRow key={internship.id}>
                     <TableCell>
                       <div>
-                        <div className="font-semibold">{job.title}</div>
-                        <div className="text-sm text-gray-500">{job.type}</div>
+                        <div className="font-semibold">{internship.title}</div>
+                        <div className="text-sm text-gray-500">{internship.type}</div>
                       </div>
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center">
                         <MapPin className="h-3 w-3 mr-1" />
-                        {job.location}
+                        {internship.location}
                       </div>
                     </TableCell>
                     <TableCell>
-                      <Badge className={getStatusColor(job.status)}>
-                        {job.status}
+                      <Badge className={getStatusColor(internship.status)}>
+                        {internship.status}
                       </Badge>
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center">
                         <Users className="h-3 w-3 mr-1" />
-                        {job.applications}
+                        {internship.applications}
                       </div>
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center">
                         <Eye className="h-3 w-3 mr-1" />
-                        {job.views}
+                        {internship.views}
                       </div>
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center">
                         <Calendar className="h-3 w-3 mr-1" />
-                        {new Date(job.posted).toLocaleDateString()}
+                        {new Date(internship.posted).toLocaleDateString()}
                       </div>
                     </TableCell>
                     <TableCell>
@@ -185,14 +185,14 @@ const JobPostingsManagement = () => {
                         <Button 
                           variant="outline" 
                           size="sm"
-                          onClick={() => handleToggleStatus(job.id)}
+                          onClick={() => handleToggleStatus(internship.id)}
                         >
-                          {job.status === "Active" ? "Pause" : "Activate"}
+                          {internship.status === "Active" ? "Pause" : "Activate"}
                         </Button>
                         <Button 
                           variant="outline" 
                           size="sm"
-                          onClick={() => handleDeleteJob(job.id, job.title)}
+                          onClick={() => handleDeleteInternship(internship.id, internship.title)}
                         >
                           <Trash2 className="h-3 w-3" />
                         </Button>

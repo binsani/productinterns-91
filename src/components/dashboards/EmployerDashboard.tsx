@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -39,7 +40,7 @@ const EmployerDashboard = () => {
   const navigationItems = [
     { id: "overview", label: "Overview", icon: TrendingUp },
     { id: "company", label: "Company Profile", icon: Building2 },
-    { id: "postings", label: "Job Postings", icon: Plus },
+    { id: "postings", label: "PM Internships", icon: Plus },
     { id: "applicants", label: "Applicants", icon: Users },
     { id: "messages", label: "Messages", icon: MessageSquare },
     { id: "interviews", label: "Interviews", icon: Calendar },
@@ -52,7 +53,7 @@ const EmployerDashboard = () => {
   };
 
   const handleJobEdit = (id: number) => {
-    console.log("Edit job:", id);
+    console.log("Edit PM internship:", id);
   };
 
   const handleApplicantReview = (id: number, name: string) => {
@@ -73,7 +74,7 @@ const EmployerDashboard = () => {
       {/* Quick Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <StatsCard
-          title="Active Postings"
+          title="Active PM Internships"
           value="5"
           change="2 expiring soon"
           icon={Plus}
@@ -98,16 +99,16 @@ const EmployerDashboard = () => {
         />
       </div>
 
-      {/* Active Job Postings */}
+      {/* Active PM Internship Postings */}
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
           <div>
-            <CardTitle>Active Job Postings</CardTitle>
-            <CardDescription>Manage your current internship listings</CardDescription>
+            <CardTitle>Active PM Internship Postings</CardTitle>
+            <CardDescription>Manage your current product management internship listings</CardDescription>
           </div>
           <Button onClick={() => setIsJobPostingModalOpen(true)}>
             <Plus className="h-4 w-4 mr-2" />
-            Post New Job
+            Post New PM Internship
           </Button>
         </CardHeader>
         <CardContent>
@@ -140,17 +141,17 @@ const EmployerDashboard = () => {
                 status: "Active",
                 location: "New York, NY"
               },
-            ].map((job) => (
+            ].map((internship) => (
               <JobCard
-                key={job.id}
-                id={job.id}
-                title={job.title}
-                location={job.location}
+                key={internship.id}
+                id={internship.id}
+                title={internship.title}
+                location={internship.location}
                 type="Full-time"
-                applications={job.applications}
-                views={job.views}
-                posted={job.posted}
-                status={job.status}
+                applications={internship.applications}
+                views={internship.views}
+                posted={internship.posted}
+                status={internship.status}
                 onView={handleJobView}
                 onEdit={handleJobEdit}
                 variant="posting"
@@ -164,7 +165,7 @@ const EmployerDashboard = () => {
       <Card>
         <CardHeader>
           <CardTitle>Recent Applications</CardTitle>
-          <CardDescription>New candidates for your consideration</CardDescription>
+          <CardDescription>New candidates for your PM internship consideration</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
@@ -221,7 +222,7 @@ const EmployerDashboard = () => {
       <Card>
         <CardHeader>
           <CardTitle>Company Information</CardTitle>
-          <CardDescription>Showcase your company to attract top talent</CardDescription>
+          <CardDescription>Showcase your company to attract top PM talent</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex items-center space-x-4">
@@ -258,7 +259,7 @@ const EmployerDashboard = () => {
       <Card>
         <CardHeader>
           <CardTitle>Company Culture & Values</CardTitle>
-          <CardDescription>Help candidates understand your work environment</CardDescription>
+          <CardDescription>Help PM candidates understand your work environment</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
@@ -267,7 +268,7 @@ const EmployerDashboard = () => {
               <p className="text-gray-700 mt-1">
                 We're a fast-growing technology company focused on building innovative products 
                 that solve real-world problems. Our team values collaboration, innovation, and 
-                continuous learning.
+                continuous learning. We offer excellent opportunities for PM interns to grow.
               </p>
             </div>
             <div>
