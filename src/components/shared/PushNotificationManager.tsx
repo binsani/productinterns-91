@@ -129,11 +129,15 @@ const PushNotificationManager = () => {
 
   const sendTestNotification = () => {
     if (permission === 'granted') {
+      // Handle vibration separately if enabled and supported
+      if (settings.vibrateEnabled && 'vibrate' in navigator) {
+        navigator.vibrate([200, 100, 200]);
+      }
+
       const notification = new Notification('Test Notification', {
         body: 'This is a test notification from InternMatch!',
         icon: '/placeholder.svg',
         badge: '/placeholder.svg',
-        vibrate: settings.vibrateEnabled ? [200, 100, 200] : undefined,
         silent: !settings.soundEnabled
       });
 
