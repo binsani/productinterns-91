@@ -9,7 +9,10 @@ import {
   Target, 
   MessageSquare, 
   BookOpen,
-  TrendingUp
+  TrendingUp,
+  PenTool,
+  Calendar,
+  Edit
 } from "lucide-react";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import ApplicationTracker from "@/components/intern/ApplicationTracker";
@@ -23,6 +26,9 @@ import InternshipBrowser from "@/components/intern/InternshipBrowser";
 import SavedJobs from "@/components/intern/SavedJobs";
 import Messages from "@/components/intern/Messages";
 import Learning from "@/components/intern/Learning";
+import ResumeBuilder from "@/components/intern/ResumeBuilder";
+import CoverLetterTemplates from "@/components/intern/CoverLetterTemplates";
+import InterviewScheduling from "@/components/intern/InterviewScheduling";
 
 const InternDashboard = () => {
   const [activeTab, setActiveTab] = useState("overview");
@@ -32,6 +38,9 @@ const InternDashboard = () => {
     { id: "profile", label: "Profile", icon: User },
     { id: "internships", label: "Internships", icon: Search },
     { id: "applications", label: "Applications", icon: FileText },
+    { id: "interviews", label: "Interviews", icon: Calendar },
+    { id: "resume", label: "Resume Builder", icon: Edit },
+    { id: "cover-letter", label: "Cover Letters", icon: PenTool },
     { id: "saved", label: "Saved", icon: Bookmark },
     { id: "skills", label: "Skill Tests", icon: Target },
     { id: "messages", label: "Messages", icon: MessageSquare },
@@ -57,6 +66,12 @@ const InternDashboard = () => {
         return <InternshipBrowser />;
       case "applications":
         return <ApplicationTracker />;
+      case "interviews":
+        return <InterviewScheduling />;
+      case "resume":
+        return <ResumeBuilder />;
+      case "cover-letter":
+        return <CoverLetterTemplates />;
       case "saved":
         return <SavedJobs />;
       case "skills":
