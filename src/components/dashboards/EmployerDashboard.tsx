@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -17,7 +16,8 @@ import {
   UserCheck,
   MapPin,
   Eye,
-  Clock
+  Clock,
+  Settings
 } from "lucide-react";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import ApplicantManagement from "@/components/employer/ApplicantManagement";
@@ -27,15 +27,21 @@ import JobPostingsManagement from "@/components/employer/JobPostingsManagement";
 import InterviewScheduling from "@/components/employer/InterviewScheduling";
 import AnalyticsReporting from "@/components/employer/AnalyticsReporting";
 import BillingManagement from "@/components/employer/BillingManagement";
+import Messages from "@/components/employer/Messages";
+import CompanyProfileEditor from "@/components/employer/CompanyProfileEditor";
+import Settings from "@/components/employer/Settings";
 import StatsCard from "@/components/shared/StatsCard";
 import WelcomeHero from "@/components/shared/WelcomeHero";
 import JobCard from "@/components/shared/JobCard";
 import ApplicationCard from "@/components/shared/ApplicationCard";
+import ScheduleInterviewModal from "@/components/employer/ScheduleInterviewModal";
 
 const EmployerDashboard = () => {
   const { user } = useAuthStore();
   const [activeTab, setActiveTab] = useState("overview");
   const [isJobPostingModalOpen, setIsJobPostingModalOpen] = useState(false);
+  const [isScheduleInterviewModalOpen, setIsScheduleInterviewModalOpen] = useState(false);
+  const [selectedCandidate, setSelectedCandidate] = useState<{name: string, position: string} | null>(null);
 
   const navigationItems = [
     { id: "overview", label: "Overview", icon: TrendingUp },
@@ -46,6 +52,7 @@ const EmployerDashboard = () => {
     { id: "interviews", label: "Interviews", icon: Calendar },
     { id: "analytics", label: "Analytics", icon: BarChart3 },
     { id: "billing", label: "Billing", icon: CreditCard },
+    { id: "settings", label: "Settings", icon: Settings },
   ];
 
   const handleJobView = (id: number) => {
@@ -58,6 +65,11 @@ const EmployerDashboard = () => {
 
   const handleApplicantReview = (id: number, name: string) => {
     console.log("Review applicant:", id, name);
+  };
+
+  const handleScheduleInterview = (candidateName: string, position: string) => {
+    setSelectedCandidate({ name: candidateName, position });
+    setIsScheduleInterviewModalOpen(true);
   };
 
   const renderOverview = () => (
@@ -217,73 +229,7 @@ const EmployerDashboard = () => {
     </div>
   );
 
-  const renderCompanyProfile = () => (
-    <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>Company Information</CardTitle>
-          <CardDescription>Showcase your company to attract top PM talent</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex items-center space-x-4">
-            <div className="w-20 h-20 bg-gradient-to-br from-blue-600 to-green-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-2xl">{user?.companyName?.charAt(0)}</span>
-            </div>
-            <div>
-              <h3 className="text-xl font-semibold">{user?.companyName}</h3>
-              <p className="text-gray-600">Technology • 500-1000 employees</p>
-              <Button variant="outline" size="sm" className="mt-2">Update Logo</Button>
-            </div>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="text-sm font-medium">Industry</label>
-              <p className="text-gray-700">Technology & Software</p>
-            </div>
-            <div>
-              <label className="text-sm font-medium">Company Size</label>
-              <p className="text-gray-700">500-1000 employees</p>
-            </div>
-            <div>
-              <label className="text-sm font-medium">Location</label>
-              <p className="text-gray-700">San Francisco, CA</p>
-            </div>
-            <div>
-              <label className="text-sm font-medium">Founded</label>
-              <p className="text-gray-700">2015</p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Company Culture & Values</CardTitle>
-          <CardDescription>Help PM candidates understand your work environment</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            <div>
-              <label className="text-sm font-medium">Company Description</label>
-              <p className="text-gray-700 mt-1">
-                We're a fast-growing technology company focused on building innovative products 
-                that solve real-world problems. Our team values collaboration, innovation, and 
-                continuous learning. We offer excellent opportunities for PM interns to grow.
-              </p>
-            </div>
-            <div>
-              <label className="text-sm font-medium">Benefits & Perks</label>
-              <div className="flex flex-wrap gap-2 mt-1">
-                {["Health Insurance", "Flexible Hours", "Remote Work", "Learning Budget", "Free Lunch"].map((benefit) => (
-                  <Badge key={benefit} variant="secondary">{benefit}</Badge>
-                ))}
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
-  );
+  const renderCompanyProfile = () => <CompanyProfileEditor />;
 
   const renderContent = () => {
     switch (activeTab) {
@@ -294,13 +240,17 @@ const EmployerDashboard = () => {
       case "postings":
         return <JobPostingsManagement />;
       case "applicants":
-        return <ApplicantManagement />;
+        return <ApplicantManagement onScheduleInterview={handleScheduleInterview} />;
+      case "messages":
+        return <Messages />;
       case "interviews":
         return <InterviewScheduling />;
       case "analytics":
         return <AnalyticsReporting />;
       case "billing":
         return <BillingManagement />;
+      case "settings":
+        return <Settings />;
       default:
         return (
           <Card>
@@ -330,6 +280,16 @@ const EmployerDashboard = () => {
       <JobPostingModal 
         isOpen={isJobPostingModalOpen} 
         onClose={() => setIsJobPostingModalOpen(false)} 
+      />
+      
+      <ScheduleInterviewModal
+        isOpen={isScheduleInterviewModalOpen}
+        onClose={() => {
+          setIsScheduleInterviewModalOpen(false);
+          setSelectedCandidate(null);
+        }}
+        candidateName={selectedCandidate?.name}
+        position={selectedCandidate?.position}
       />
     </>
   );
