@@ -29,7 +29,7 @@ import AnalyticsReporting from "@/components/employer/AnalyticsReporting";
 import BillingManagement from "@/components/employer/BillingManagement";
 import Messages from "@/components/employer/Messages";
 import CompanyProfileEditor from "@/components/employer/CompanyProfileEditor";
-import Settings from "@/components/employer/Settings";
+import SettingsPage from "@/components/employer/Settings";
 import StatsCard from "@/components/shared/StatsCard";
 import WelcomeHero from "@/components/shared/WelcomeHero";
 import JobCard from "@/components/shared/JobCard";
@@ -240,7 +240,7 @@ const EmployerDashboard = () => {
       case "postings":
         return <JobPostingsManagement />;
       case "applicants":
-        return <ApplicantManagement onScheduleInterview={handleScheduleInterview} />;
+        return <ApplicantManagement />;
       case "messages":
         return <Messages />;
       case "interviews":
@@ -250,7 +250,7 @@ const EmployerDashboard = () => {
       case "billing":
         return <BillingManagement />;
       case "settings":
-        return <Settings />;
+        return <SettingsPage />;
       default:
         return (
           <Card>
