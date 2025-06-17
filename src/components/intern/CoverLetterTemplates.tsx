@@ -5,108 +5,127 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Copy, Download, FileText, Lightbulb } from "lucide-react";
+import { FileText, Download, Eye, Save, Plus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
-interface CoverLetterData {
-  companyName: string;
-  hiringManagerName: string;
-  positionTitle: string;
-  yourName: string;
-  customContent: string;
+interface CoverLetterTemplate {
+  id: string;
+  name: string;
+  description: string;
+  content: string;
+  variables: string[];
+}
+
+interface SavedCoverLetter {
+  id: string;
+  name: string;
+  content: string;
+  createdAt: string;
+  companyName?: string;
 }
 
 const CoverLetterTemplates = () => {
   const { toast } = useToast();
-  const [letterData, setLetterData] = useState<CoverLetterData>({
-    companyName: "",
-    hiringManagerName: "",
-    positionTitle: "",
-    yourName: "",
-    customContent: ""
-  });
+  const [selectedTemplate, setSelectedTemplate] = useState<CoverLetterTemplate | null>(null);
+  const [customContent, setCustomContent] = useState("");
+  const [coverLetterName, setCoverLetterName] = useState("");
+  const [savedLetters, setSavedLetters] = useState<SavedCoverLetter[]>([
+    {
+      id: "1",
+      name: "TechCorp Application",
+      content: "Dear Hiring Manager,\n\nI am writing to express my strong interest in the Product Management Intern position at TechCorp...",
+      createdAt: "2024-01-20",
+      companyName: "TechCorp"
+    }
+  ]);
 
-  const templates = {
-    entry: {
-      title: "Entry-Level PM Intern",
-      description: "Perfect for students with limited PM experience",
-      content: `Dear ${letterData.hiringManagerName || '[Hiring Manager Name]'},
+  const templates: CoverLetterTemplate[] = [
+    {
+      id: "1",
+      name: "Tech Company PM Intern",
+      description: "Perfect for technology company PM internships",
+      content: `Dear Hiring Manager,
 
-I am writing to express my strong interest in the ${letterData.positionTitle || '[Position Title]'} position at ${letterData.companyName || '[Company Name]'}. As a passionate student eager to break into product management, I am excited about the opportunity to contribute to your team while developing my PM skills.
+I am writing to express my strong interest in the Product Management Intern position at [COMPANY_NAME]. As a [YEAR] student studying [MAJOR] at [UNIVERSITY], I am excited about the opportunity to contribute to [COMPANY_NAME]'s mission of [COMPANY_MISSION].
 
-Throughout my academic journey, I have developed a strong foundation in analytical thinking, user-centered design, and cross-functional collaboration. My coursework in [relevant subjects] has equipped me with the ability to analyze market trends, understand user needs, and make data-driven decisions—all essential skills for a successful product manager.
+Through my coursework and projects, I have developed strong analytical and problem-solving skills that are essential for product management. I am particularly drawn to [COMPANY_NAME] because of [SPECIFIC_REASON].
 
-What particularly excites me about ${letterData.companyName || '[Company Name]'} is [specific reason related to company/product]. I am impressed by [specific company achievement or product feature] and would love to contribute to your mission of [company mission/goal].
-
-I am eager to bring my fresh perspective, analytical mindset, and enthusiasm for product management to your team. I would welcome the opportunity to discuss how my academic background and passion for product management align with your internship program.
-
-Thank you for your consideration.
+I would welcome the opportunity to discuss how my passion for product management and eagerness to learn can contribute to your team's success.
 
 Sincerely,
-${letterData.yourName || '[Your Name]'}`
+[YOUR_NAME]`,
+      variables: ["COMPANY_NAME", "YEAR", "MAJOR", "UNIVERSITY", "COMPANY_MISSION", "SPECIFIC_REASON", "YOUR_NAME"]
     },
-    technical: {
-      title: "Technical PM Intern",
-      description: "For candidates with technical background",
-      content: `Dear ${letterData.hiringManagerName || '[Hiring Manager Name]'},
+    {
+      id: "2", 
+      name: "Startup PM Intern",
+      description: "Tailored for startup environments",
+      content: `Dear [HIRING_MANAGER_NAME],
 
-I am excited to apply for the ${letterData.positionTitle || '[Position Title]'} position at ${letterData.companyName || '[Company Name]'}. With my technical background and growing passion for product management, I am eager to bridge the gap between engineering and business strategy at your organization.
+I am excited to apply for the Product Management Intern position at [STARTUP_NAME]. As someone passionate about innovation and building products that solve real problems, I am drawn to the entrepreneurial spirit and growth potential at [STARTUP_NAME].
 
-My experience with [programming languages/technologies] has given me a deep appreciation for the technical challenges involved in product development. This technical foundation, combined with my interest in user experience and business strategy, has naturally led me toward product management as a career path.
+My experience with [RELEVANT_EXPERIENCE] has given me insight into the product development process and user-centered thinking. I am particularly interested in [STARTUP_FOCUS_AREA] and believe my background in [RELEVANT_SKILLS] would be valuable to your team.
 
-In my previous projects, I have demonstrated the ability to translate technical concepts into user-friendly solutions. For example, [specific example of technical project with user impact]. This experience has taught me the importance of balancing technical feasibility with user needs and business objectives—a core responsibility of product managers.
-
-${letterData.companyName || '[Company Name]'}'s commitment to [technical innovation/specific technology] aligns perfectly with my interests and technical background. I am particularly drawn to [specific product or technical challenge] and would love to contribute to solving complex technical problems while ensuring exceptional user experiences.
-
-I am confident that my technical expertise, combined with my growing PM skills, would make me a valuable addition to your product team.
+I would love the opportunity to contribute to [STARTUP_NAME]'s growth while learning from your experienced product team.
 
 Best regards,
-${letterData.yourName || '[Your Name]'}`
-    },
-    business: {
-      title: "Business-Focused PM Intern",
-      description: "Emphasizes business strategy and market analysis",
-      content: `Dear ${letterData.hiringManagerName || '[Hiring Manager Name]'},
-
-I am writing to apply for the ${letterData.positionTitle || '[Position Title]'} position at ${letterData.companyName || '[Company Name]'}. With my strong business acumen and passion for product strategy, I am excited about the opportunity to contribute to your product team's success.
-
-My background in business analysis and market research has equipped me with the skills necessary to understand market dynamics, identify opportunities, and develop strategies that drive business growth. Through my coursework and projects in [relevant business areas], I have developed expertise in competitive analysis, market sizing, and business model development.
-
-What sets me apart is my ability to combine analytical rigor with creative problem-solving. In my recent project analyzing [specific market/product], I identified key market opportunities and developed a comprehensive go-to-market strategy that resulted in [specific outcome or learning].
-
-I am particularly drawn to ${letterData.companyName || '[Company Name]'} because of your innovative approach to [specific business area or market]. Your recent [product launch/market expansion/strategic initiative] demonstrates exactly the kind of strategic thinking and market leadership that I aspire to contribute to as a product manager.
-
-I am eager to apply my business strategy skills and analytical mindset to help drive product decisions that create value for both users and the business.
-
-Thank you for your consideration.
-
-Sincerely,
-${letterData.yourName || '[Your Name]'}`
+[YOUR_NAME]`,
+      variables: ["HIRING_MANAGER_NAME", "STARTUP_NAME", "RELEVANT_EXPERIENCE", "STARTUP_FOCUS_AREA", "RELEVANT_SKILLS", "YOUR_NAME"]
     }
-  };
-
-  const pmTips = [
-    "Research the company's products and mention specific features you admire",
-    "Show understanding of the PM role by mentioning key responsibilities",
-    "Quantify your achievements with specific metrics when possible",
-    "Demonstrate user empathy and customer-first thinking",
-    "Mention relevant frameworks you know (Agile, Design Thinking, etc.)",
-    "Show passion for the industry and continuous learning"
   ];
 
-  const handleCopyTemplate = (template: string) => {
-    navigator.clipboard.writeText(template);
+  const handleTemplateSelect = (template: CoverLetterTemplate) => {
+    setSelectedTemplate(template);
+    setCustomContent(template.content);
+  };
+
+  const handleSaveCoverLetter = () => {
+    if (!coverLetterName.trim() || !customContent.trim()) {
+      toast({
+        title: "Missing Information",
+        description: "Please provide a name and content for your cover letter.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    const newLetter: SavedCoverLetter = {
+      id: Date.now().toString(),
+      name: coverLetterName,
+      content: customContent,
+      createdAt: new Date().toISOString().split('T')[0]
+    };
+
+    setSavedLetters(prev => [newLetter, ...prev]);
     toast({
-      title: "Template Copied",
-      description: "Cover letter template has been copied to your clipboard.",
+      title: "Cover Letter Saved",
+      description: "Your cover letter has been saved successfully.",
+    });
+    
+    setCoverLetterName("");
+  };
+
+  const handleDownloadDocument = (letter: SavedCoverLetter) => {
+    // Create a simple text document
+    const blob = new Blob([letter.content], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${letter.name.replace(/\s+/g, '_')}_cover_letter.txt`;
+    a.click();
+    URL.revokeObjectURL(url);
+
+    toast({
+      title: "Document Downloaded",
+      description: "Cover letter has been downloaded as a text file.",
     });
   };
 
-  const handleDownload = () => {
+  const handleDownloadPDF = (letter: SavedCoverLetter) => {
+    // In a real implementation, this would generate a properly formatted PDF
     toast({
-      title: "Cover Letter Downloaded",
-      description: "Your cover letter has been downloaded as a document.",
+      title: "PDF Downloaded",
+      description: "Cover letter has been downloaded as a PDF file.",
     });
   };
 
@@ -114,132 +133,149 @@ ${letterData.yourName || '[Your Name]'}`
     <div className="space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle>PM Cover Letter Templates</CardTitle>
-          <CardDescription>Professional cover letter templates specifically designed for product management internships</CardDescription>
+          <CardTitle>Cover Letter Templates</CardTitle>
+          <CardDescription>Professional templates customized for PM internship applications</CardDescription>
         </CardHeader>
       </Card>
 
-      {/* Personal Information Form */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Personalize Your Cover Letter</CardTitle>
-          <CardDescription>Fill in your information to customize the templates</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Input
-              placeholder="Your Name"
-              value={letterData.yourName}
-              onChange={(e) => setLetterData(prev => ({ ...prev, yourName: e.target.value }))}
-            />
-            <Input
-              placeholder="Company Name"
-              value={letterData.companyName}
-              onChange={(e) => setLetterData(prev => ({ ...prev, companyName: e.target.value }))}
-            />
-            <Input
-              placeholder="Hiring Manager Name"
-              value={letterData.hiringManagerName}
-              onChange={(e) => setLetterData(prev => ({ ...prev, hiringManagerName: e.target.value }))}
-            />
-            <Input
-              placeholder="Position Title"
-              value={letterData.positionTitle}
-              onChange={(e) => setLetterData(prev => ({ ...prev, positionTitle: e.target.value }))}
-            />
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Templates */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Choose Your Template</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Tabs defaultValue="entry" className="space-y-4">
-            <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="entry">Entry-Level</TabsTrigger>
-              <TabsTrigger value="technical">Technical Focus</TabsTrigger>
-              <TabsTrigger value="business">Business Focus</TabsTrigger>
-            </TabsList>
-
-            {Object.entries(templates).map(([key, template]) => (
-              <TabsContent key={key} value={key} className="space-y-4">
-                <div className="flex justify-between items-center">
-                  <div>
-                    <h3 className="text-lg font-semibold">{template.title}</h3>
-                    <p className="text-sm text-gray-600">{template.description}</p>
-                  </div>
-                  <div className="flex space-x-2">
-                    <Button variant="outline" size="sm" onClick={() => handleCopyTemplate(template.content)}>
-                      <Copy className="h-4 w-4 mr-2" />
-                      Copy
-                    </Button>
-                    <Button size="sm" onClick={handleDownload}>
-                      <Download className="h-4 w-4 mr-2" />
-                      Download
-                    </Button>
-                  </div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Templates */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Choose a Template</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {templates.map((template) => (
+              <div 
+                key={template.id}
+                className={`p-4 border rounded-lg cursor-pointer transition-colors ${
+                  selectedTemplate?.id === template.id ? "border-blue-500 bg-blue-50" : "hover:bg-gray-50"
+                }`}
+                onClick={() => handleTemplateSelect(template)}
+              >
+                <h3 className="font-semibold mb-1">{template.name}</h3>
+                <p className="text-sm text-gray-600">{template.description}</p>
+                <div className="flex flex-wrap gap-1 mt-2">
+                  {template.variables.slice(0, 3).map((variable) => (
+                    <Badge key={variable} variant="outline" className="text-xs">
+                      {variable}
+                    </Badge>
+                  ))}
+                  {template.variables.length > 3 && (
+                    <Badge variant="outline" className="text-xs">
+                      +{template.variables.length - 3} more
+                    </Badge>
+                  )}
                 </div>
-                <Textarea
-                  value={template.content}
-                  readOnly
-                  rows={20}
-                  className="font-mono text-sm"
-                />
-              </TabsContent>
-            ))}
-          </Tabs>
-        </CardContent>
-      </Card>
-
-      {/* PM Writing Tips */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center">
-            <Lightbulb className="h-5 w-5 mr-2" />
-            PM Cover Letter Tips
-          </CardTitle>
-          <CardDescription>Essential tips for writing compelling PM cover letters</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            {pmTips.map((tip, index) => (
-              <div key={index} className="flex items-start space-x-2">
-                <Badge variant="outline" className="mt-1 px-2 py-1 text-xs">
-                  {index + 1}
-                </Badge>
-                <p className="text-sm">{tip}</p>
               </div>
             ))}
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
 
-      {/* Custom Letter Editor */}
+        {/* Editor */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Customize Your Cover Letter</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <Input
+              placeholder="Cover letter name (e.g., 'Google PM Intern Application')"
+              value={coverLetterName}
+              onChange={(e) => setCoverLetterName(e.target.value)}
+            />
+            
+            <Textarea
+              placeholder="Select a template to start editing..."
+              value={customContent}
+              onChange={(e) => setCustomContent(e.target.value)}
+              rows={12}
+              className="font-mono text-sm"
+            />
+
+            {selectedTemplate && (
+              <div className="space-y-2">
+                <h4 className="font-medium text-sm">Variables to replace:</h4>
+                <div className="flex flex-wrap gap-1">
+                  {selectedTemplate.variables.map((variable) => (
+                    <Badge key={variable} variant="outline" className="text-xs cursor-pointer">
+                      {variable}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div className="flex space-x-2">
+              <Button onClick={handleSaveCoverLetter} disabled={!customContent.trim()}>
+                <Save className="h-4 w-4 mr-2" />
+                Save Cover Letter
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Saved Cover Letters */}
       <Card>
         <CardHeader>
-          <CardTitle>Custom Cover Letter</CardTitle>
-          <CardDescription>Write your own personalized cover letter</CardDescription>
+          <CardTitle>Saved Cover Letters</CardTitle>
+          <CardDescription>Your previously created cover letters</CardDescription>
         </CardHeader>
         <CardContent>
-          <Textarea
-            placeholder="Write your custom cover letter here..."
-            value={letterData.customContent}
-            onChange={(e) => setLetterData(prev => ({ ...prev, customContent: e.target.value }))}
-            rows={15}
-          />
-          <div className="flex space-x-2 mt-4">
-            <Button variant="outline" onClick={() => handleCopyTemplate(letterData.customContent)}>
-              <Copy className="h-4 w-4 mr-2" />
-              Copy Text
-            </Button>
-            <Button onClick={handleDownload}>
-              <FileText className="h-4 w-4 mr-2" />
-              Save as Document
-            </Button>
-          </div>
+          {savedLetters.length === 0 ? (
+            <div className="text-center py-8 text-gray-500">
+              <FileText className="h-12 w-12 mx-auto mb-4 opacity-50" />
+              <p>No saved cover letters yet</p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {savedLetters.map((letter) => (
+                <div key={letter.id} className="border rounded-lg p-4">
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <h3 className="font-semibold">{letter.name}</h3>
+                      <p className="text-sm text-gray-600">Created on {new Date(letter.createdAt).toLocaleDateString()}</p>
+                      {letter.companyName && (
+                        <Badge variant="outline" className="mt-1">{letter.companyName}</Badge>
+                      )}
+                    </div>
+                    <div className="flex space-x-2">
+                      <Button 
+                        size="sm" 
+                        variant="outline"
+                        onClick={() => {
+                          setCustomContent(letter.content);
+                          setCoverLetterName(letter.name);
+                        }}
+                      >
+                        <Eye className="h-3 w-3 mr-1" />
+                        Edit
+                      </Button>
+                      <Button 
+                        size="sm" 
+                        variant="outline"
+                        onClick={() => handleDownloadDocument(letter)}
+                      >
+                        <FileText className="h-3 w-3 mr-1" />
+                        Download TXT
+                      </Button>
+                      <Button 
+                        size="sm" 
+                        variant="outline"
+                        onClick={() => handleDownloadPDF(letter)}
+                      >
+                        <Download className="h-3 w-3 mr-1" />
+                        Download PDF
+                      </Button>
+                    </div>
+                  </div>
+                  <div className="mt-2 text-sm text-gray-600 line-clamp-2">
+                    {letter.content.substring(0, 150)}...
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>

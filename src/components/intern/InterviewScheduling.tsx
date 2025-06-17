@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -17,6 +16,8 @@ import {
   MessageSquare
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import JoinInterviewModal from "./JoinInterviewModal";
+import AddToCalendarModal from "./AddToCalendarModal";
 
 interface Interview {
   id: string;
@@ -39,7 +40,11 @@ interface Interview {
 const InterviewScheduling = () => {
   const { toast } = useToast();
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
-  const [interviews, setInterviews] = useState<Interview[]>([
+  const [showJoinModal, setShowJoinModal] = useState(false);
+  const [showCalendarModal, setShowCalendarModal] = useState(false);
+  const [selectedInterview, setSelectedInterview] = useState<Interview | null>(null);
+
+  const interviews = [
     {
       id: "1",
       company: "TechCorp",
@@ -106,7 +111,7 @@ const InterviewScheduling = () => {
         ]
       }
     }
-  ]);
+  ];
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -150,13 +155,13 @@ const InterviewScheduling = () => {
   };
 
   const handleJoinInterview = (interview: Interview) => {
-    if (interview.meetingLink) {
-      window.open(interview.meetingLink, '_blank');
-    }
-    toast({
-      title: "Joining Interview",
-      description: `Opening ${interview.type} interview link.`,
-    });
+    setSelectedInterview(interview);
+    setShowJoinModal(true);
+  };
+
+  const handleAddToCalendar = (interview: Interview) => {
+    setSelectedInterview(interview);
+    setShowCalendarModal(true);
   };
 
   const upcomingInterviews = interviews.filter(interview => 
@@ -168,221 +173,260 @@ const InterviewScheduling = () => {
   );
 
   return (
-    <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>Interview Scheduling</CardTitle>
-          <CardDescription>Manage your PM internship interviews and prepare for success</CardDescription>
-        </CardHeader>
-      </Card>
+    <>
+      <div className="space-y-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>Interview Scheduling</CardTitle>
+            <CardDescription>Manage your PM internship interviews and prepare for success</CardDescription>
+          </CardHeader>
+        </Card>
 
-      {/* Quick Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card>
-          <CardContent className="p-4 text-center">
-            <div className="text-2xl font-bold text-blue-600">{upcomingInterviews.length}</div>
-            <div className="text-sm text-gray-600">Upcoming</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-4 text-center">
-            <div className="text-2xl font-bold text-green-600">
-              {interviews.filter(i => i.status === "confirmed").length}
-            </div>
-            <div className="text-sm text-gray-600">Confirmed</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-4 text-center">
-            <div className="text-2xl font-bold text-purple-600">{todayInterviews.length}</div>
-            <div className="text-sm text-gray-600">Today</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-4 text-center">
-            <div className="text-2xl font-bold text-gray-600">
-              {interviews.filter(i => i.status === "completed").length}
-            </div>
-            <div className="text-sm text-gray-600">Completed</div>
-          </CardContent>
-        </Card>
-      </div>
+        {/* Quick Stats */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <Card>
+            <CardContent className="p-4 text-center">
+              <div className="text-2xl font-bold text-blue-600">{upcomingInterviews.length}</div>
+              <div className="text-sm text-gray-600">Upcoming</div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="p-4 text-center">
+              <div className="text-2xl font-bold text-green-600">
+                {interviews.filter(i => i.status === "confirmed").length}
+              </div>
+              <div className="text-sm text-gray-600">Confirmed</div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="p-4 text-center">
+              <div className="text-2xl font-bold text-purple-600">{todayInterviews.length}</div>
+              <div className="text-sm text-gray-600">Today</div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="p-4 text-center">
+              <div className="text-2xl font-bold text-gray-600">
+                {interviews.filter(i => i.status === "completed").length}
+              </div>
+              <div className="text-sm text-gray-600">Completed</div>
+            </CardContent>
+          </Card>
+        </div>
 
-      <Card>
-        <CardContent className="p-6">
-          <Tabs defaultValue="upcoming" className="space-y-4">
-            <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="upcoming">Upcoming</TabsTrigger>
-              <TabsTrigger value="calendar">Calendar View</TabsTrigger>
-              <TabsTrigger value="preparation">Preparation</TabsTrigger>
-            </TabsList>
+        <Card>
+          <CardContent className="p-6">
+            <Tabs defaultValue="upcoming" className="space-y-4">
+              <TabsList className="grid w-full grid-cols-3">
+                <TabsTrigger value="upcoming">Upcoming</TabsTrigger>
+                <TabsTrigger value="calendar">Calendar View</TabsTrigger>
+                <TabsTrigger value="preparation">Preparation</TabsTrigger>
+              </TabsList>
 
-            <TabsContent value="upcoming" className="space-y-4">
-              {upcomingInterviews.length === 0 ? (
-                <div className="text-center py-8 text-gray-500">
-                  <CalendarIcon className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                  <p>No upcoming interviews scheduled</p>
-                </div>
-              ) : (
-                upcomingInterviews.map((interview) => (
-                  <div key={interview.id} className="border rounded-lg p-4 space-y-3">
-                    <div className="flex items-start justify-between">
-                      <div className="space-y-1">
-                        <h3 className="font-semibold text-lg">{interview.position}</h3>
-                        <p className="text-gray-600">{interview.company}</p>
-                        <div className="flex items-center space-x-4 text-sm text-gray-500">
-                          <span className="flex items-center">
-                            <CalendarIcon className="h-4 w-4 mr-1" />
-                            {new Date(interview.date).toLocaleDateString()}
-                          </span>
-                          <span className="flex items-center">
-                            <Clock className="h-4 w-4 mr-1" />
-                            {interview.time} ({interview.duration} min)
-                          </span>
-                          <span className="flex items-center">
-                            {getTypeIcon(interview.type)}
-                            <span className="ml-1 capitalize">{interview.type.replace('_', ' ')}</span>
-                          </span>
+              <TabsContent value="upcoming" className="space-y-4">
+                {upcomingInterviews.length === 0 ? (
+                  <div className="text-center py-8 text-gray-500">
+                    <CalendarIcon className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                    <p>No upcoming interviews scheduled</p>
+                  </div>
+                ) : (
+                  upcomingInterviews.map((interview) => (
+                    <div key={interview.id} className="border rounded-lg p-4 space-y-3">
+                      <div className="flex items-start justify-between">
+                        <div className="space-y-1">
+                          <h3 className="font-semibold text-lg">{interview.position}</h3>
+                          <p className="text-gray-600">{interview.company}</p>
+                          <div className="flex items-center space-x-4 text-sm text-gray-500">
+                            <span className="flex items-center">
+                              <CalendarIcon className="h-4 w-4 mr-1" />
+                              {new Date(interview.date).toLocaleDateString()}
+                            </span>
+                            <span className="flex items-center">
+                              <Clock className="h-4 w-4 mr-1" />
+                              {interview.time} ({interview.duration} min)
+                            </span>
+                            <span className="flex items-center">
+                              {getTypeIcon(interview.type)}
+                              <span className="ml-1 capitalize">{interview.type.replace('_', ' ')}</span>
+                            </span>
+                          </div>
+                        </div>
+                        <Badge className={getStatusColor(interview.status)}>
+                          <span className="capitalize">{interview.status}</span>
+                        </Badge>
+                      </div>
+
+                      {interview.location && (
+                        <div className="flex items-center text-sm text-gray-600">
+                          <MapPin className="h-4 w-4 mr-1" />
+                          {interview.location}
+                        </div>
+                      )}
+
+                      <div className="space-y-2">
+                        <h4 className="font-medium text-sm">Interviewers:</h4>
+                        <div className="flex flex-wrap gap-2">
+                          {interview.interviewers.map((interviewer, index) => (
+                            <Badge key={index} variant="outline" className="text-xs">
+                              {interviewer}
+                            </Badge>
+                          ))}
                         </div>
                       </div>
-                      <Badge className={getStatusColor(interview.status)}>
-                        <span className="capitalize">{interview.status}</span>
-                      </Badge>
-                    </div>
 
-                    {interview.location && (
-                      <div className="flex items-center text-sm text-gray-600">
-                        <MapPin className="h-4 w-4 mr-1" />
-                        {interview.location}
-                      </div>
-                    )}
-
-                    <div className="space-y-2">
-                      <h4 className="font-medium text-sm">Interviewers:</h4>
-                      <div className="flex flex-wrap gap-2">
-                        {interview.interviewers.map((interviewer, index) => (
-                          <Badge key={index} variant="outline" className="text-xs">
-                            {interviewer}
-                          </Badge>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div className="flex justify-between items-center pt-2">
-                      <div className="flex space-x-2">
-                        {interview.status === "scheduled" && (
-                          <Button size="sm" onClick={() => handleConfirmInterview(interview.id)}>
-                            <CheckCircle className="h-3 w-3 mr-1" />
-                            Confirm
-                          </Button>
-                        )}
-                        {interview.meetingLink && (
+                      <div className="flex justify-between items-center pt-2">
+                        <div className="flex space-x-2">
+                          {interview.status === "scheduled" && (
+                            <Button size="sm" onClick={() => handleConfirmInterview(interview.id)}>
+                              <CheckCircle className="h-3 w-3 mr-1" />
+                              Confirm
+                            </Button>
+                          )}
                           <Button size="sm" variant="outline" onClick={() => handleJoinInterview(interview)}>
                             <Video className="h-3 w-3 mr-1" />
                             Join
                           </Button>
-                        )}
-                        <Button size="sm" variant="outline" onClick={() => handleReschedule(interview.id)}>
-                          <CalendarIcon className="h-3 w-3 mr-1" />
-                          Reschedule
+                          <Button size="sm" variant="outline" onClick={() => handleAddToCalendar(interview)}>
+                            <CalendarIcon className="h-3 w-3 mr-1" />
+                            Add to Calendar
+                          </Button>
+                          <Button size="sm" variant="outline" onClick={() => handleReschedule(interview.id)}>
+                            <CalendarIcon className="h-3 w-3 mr-1" />
+                            Reschedule
+                          </Button>
+                        </div>
+                        <Button size="sm" variant="ghost">
+                          <MessageSquare className="h-3 w-3 mr-1" />
+                          Message HR
                         </Button>
                       </div>
-                      <Button size="sm" variant="ghost">
-                        <MessageSquare className="h-3 w-3 mr-1" />
-                        Message HR
-                      </Button>
                     </div>
-                  </div>
-                ))
-              )}
-            </TabsContent>
+                  ))
+                )}
+              </TabsContent>
 
-            <TabsContent value="calendar" className="space-y-4">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div>
-                  <h3 className="font-semibold mb-3">Select Date</h3>
-                  <Calendar
-                    mode="single"
-                    selected={selectedDate}
-                    onSelect={setSelectedDate}
-                    className="rounded-md border"
-                  />
-                </div>
-                <div>
-                  <h3 className="font-semibold mb-3">
-                    {selectedDate ? `Interviews on ${selectedDate.toLocaleDateString()}` : 'Select a date'}
-                  </h3>
-                  <div className="space-y-2">
-                    {selectedDate && interviews
-                      .filter(interview => interview.date === selectedDate.toISOString().split('T')[0])
-                      .map(interview => (
-                        <div key={interview.id} className="p-3 border rounded-lg">
-                          <div className="flex items-center justify-between">
-                            <div>
-                              <p className="font-medium">{interview.position}</p>
-                              <p className="text-sm text-gray-600">{interview.company}</p>
-                              <p className="text-sm text-gray-500">{interview.time}</p>
+              <TabsContent value="calendar" className="space-y-4">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  <div>
+                    <h3 className="font-semibold mb-3">Select Date</h3>
+                    <Calendar
+                      mode="single"
+                      selected={selectedDate}
+                      onSelect={setSelectedDate}
+                      className="rounded-md border"
+                    />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold mb-3">
+                      {selectedDate ? `Interviews on ${selectedDate.toLocaleDateString()}` : 'Select a date'}
+                    </h3>
+                    <div className="space-y-2">
+                      {selectedDate && interviews
+                        .filter(interview => interview.date === selectedDate.toISOString().split('T')[0])
+                        .map(interview => (
+                          <div key={interview.id} className="p-3 border rounded-lg">
+                            <div className="flex items-center justify-between">
+                              <div>
+                                <p className="font-medium">{interview.position}</p>
+                                <p className="text-sm text-gray-600">{interview.company}</p>
+                                <p className="text-sm text-gray-500">{interview.time}</p>
+                              </div>
+                              <Badge className={getStatusColor(interview.status)}>
+                                {interview.status}
+                              </Badge>
                             </div>
-                            <Badge className={getStatusColor(interview.status)}>
-                              {interview.status}
-                            </Badge>
                           </div>
-                        </div>
-                      ))}
-                    {selectedDate && interviews.filter(interview => 
-                      interview.date === selectedDate.toISOString().split('T')[0]
-                    ).length === 0 && (
-                      <p className="text-gray-500 text-center py-4">No interviews scheduled for this date</p>
-                    )}
+                        ))}
+                      {selectedDate && interviews.filter(interview => 
+                        interview.date === selectedDate.toISOString().split('T')[0]
+                      ).length === 0 && (
+                        <p className="text-gray-500 text-center py-4">No interviews scheduled for this date</p>
+                      )}
+                    </div>
                   </div>
                 </div>
-              </div>
-            </TabsContent>
+              </TabsContent>
 
-            <TabsContent value="preparation" className="space-y-4">
-              {upcomingInterviews.map((interview) => (
-                <Card key={interview.id}>
-                  <CardHeader>
-                    <CardTitle className="text-lg">{interview.position} - {interview.company}</CardTitle>
-                    <CardDescription>
-                      {new Date(interview.date).toLocaleDateString()} at {interview.time}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div>
-                      <h4 className="font-medium mb-2 flex items-center">
-                        <FileText className="h-4 w-4 mr-2" />
-                        Required Materials
-                      </h4>
-                      <div className="flex flex-wrap gap-2">
-                        {interview.preparation.materials.map((material, index) => (
-                          <Badge key={index} variant="outline">{material}</Badge>
-                        ))}
+              <TabsContent value="preparation" className="space-y-4">
+                {upcomingInterviews.map((interview) => (
+                  <Card key={interview.id}>
+                    <CardHeader>
+                      <CardTitle className="text-lg">{interview.position} - {interview.company}</CardTitle>
+                      <CardDescription>
+                        {new Date(interview.date).toLocaleDateString()} at {interview.time}
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div>
+                        <h4 className="font-medium mb-2 flex items-center">
+                          <FileText className="h-4 w-4 mr-2" />
+                          Required Materials
+                        </h4>
+                        <div className="flex flex-wrap gap-2">
+                          {interview.preparation.materials.map((material, index) => (
+                            <Badge key={index} variant="outline">{material}</Badge>
+                          ))}
+                        </div>
                       </div>
-                    </div>
-                    
-                    <div>
-                      <h4 className="font-medium mb-2 flex items-center">
-                        <AlertCircle className="h-4 w-4 mr-2" />
-                        Preparation Tips
-                      </h4>
-                      <ul className="space-y-1">
-                        {interview.preparation.tips.map((tip, index) => (
-                          <li key={index} className="text-sm text-gray-600 flex items-start">
-                            <span className="w-2 h-2 bg-blue-500 rounded-full mt-1.5 mr-2 flex-shrink-0"></span>
-                            {tip}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </TabsContent>
-          </Tabs>
-        </CardContent>
-      </Card>
-    </div>
+                      
+                      <div>
+                        <h4 className="font-medium mb-2 flex items-center">
+                          <AlertCircle className="h-4 w-4 mr-2" />
+                          Preparation Tips
+                        </h4>
+                        <ul className="space-y-1">
+                          {interview.preparation.tips.map((tip, index) => (
+                            <li key={index} className="text-sm text-gray-600 flex items-start">
+                              <span className="w-2 h-2 bg-blue-500 rounded-full mt-1.5 mr-2 flex-shrink-0"></span>
+                              {tip}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </TabsContent>
+            </Tabs>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Join Interview Modal */}
+      <JoinInterviewModal
+        isOpen={showJoinModal}
+        onClose={() => {
+          setShowJoinModal(false);
+          setSelectedInterview(null);
+        }}
+        interview={selectedInterview ? {
+          company: selectedInterview.company,
+          position: selectedInterview.position,
+          date: selectedInterview.date,
+          time: selectedInterview.time,
+          type: selectedInterview.type,
+          meetingLink: selectedInterview.meetingLink,
+          interviewers: selectedInterview.interviewers
+        } : undefined}
+      />
+
+      {/* Add to Calendar Modal */}
+      <AddToCalendarModal
+        isOpen={showCalendarModal}
+        onClose={() => {
+          setShowCalendarModal(false);
+          setSelectedInterview(null);
+        }}
+        event={selectedInterview ? {
+          title: `${selectedInterview.position} Interview`,
+          company: selectedInterview.company,
+          date: selectedInterview.date,
+          time: selectedInterview.time,
+          type: selectedInterview.type,
+          location: selectedInterview.location
+        } : undefined}
+      />
+    </>
   );
 };
 

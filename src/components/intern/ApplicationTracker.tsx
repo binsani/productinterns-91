@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -18,6 +17,7 @@ import {
   Bell
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import AddToCalendarModal from "./AddToCalendarModal";
 
 interface ApplicationUpdate {
   id: string;
@@ -47,6 +47,16 @@ interface Application {
 
 const ApplicationTracker = () => {
   const { toast } = useToast();
+  const [showAddToCalendar, setShowAddToCalendar] = useState(false);
+  const [selectedEvent, setSelectedEvent] = useState<{
+    title: string;
+    company: string;
+    date: string;
+    time: string;
+    type: string;
+    location?: string;
+  } | null>(null);
+
   const [applications, setApplications] = useState<Application[]>([
     {
       id: "1",
@@ -134,6 +144,20 @@ const ApplicationTracker = () => {
     }
   ]);
 
+  const handleAddToCalendar = (app: Application) => {
+    if (app.interviewDate) {
+      setSelectedEvent({
+        title: `${app.position} Interview`,
+        company: app.company,
+        date: app.interviewDate,
+        time: app.nextStep?.includes('at') ? app.nextStep.split('at ')[1] || '2:00 PM' : '2:00 PM',
+        type: 'Interview',
+        location: app.location
+      });
+      setShowAddToCalendar(true);
+    }
+  };
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case "applied": return "bg-blue-100 text-blue-800";
@@ -198,175 +222,193 @@ const ApplicationTracker = () => {
   };
 
   return (
-    <div className="space-y-6">
-      {/* Stats Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+    <>
+      <div className="space-y-6">
+        {/* Stats Overview */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <Card>
+            <CardContent className="p-4 text-center">
+              <div className="text-2xl font-bold text-blue-600">{stats.total}</div>
+              <div className="text-sm text-gray-600">Total Applications</div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="p-4 text-center">
+              <div className="text-2xl font-bold text-yellow-600">{stats.reviewing}</div>
+              <div className="text-sm text-gray-600">Under Review</div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="p-4 text-center">
+              <div className="text-2xl font-bold text-purple-600">{stats.interviews}</div>
+              <div className="text-sm text-gray-600">Interviews</div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="p-4 text-center">
+              <div className="text-2xl font-bold text-green-600">{stats.offers}</div>
+              <div className="text-sm text-gray-600">Offers</div>
+            </CardContent>
+          </Card>
+        </div>
+
         <Card>
-          <CardContent className="p-4 text-center">
-            <div className="text-2xl font-bold text-blue-600">{stats.total}</div>
-            <div className="text-sm text-gray-600">Total Applications</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-4 text-center">
-            <div className="text-2xl font-bold text-yellow-600">{stats.reviewing}</div>
-            <div className="text-sm text-gray-600">Under Review</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-4 text-center">
-            <div className="text-2xl font-bold text-purple-600">{stats.interviews}</div>
-            <div className="text-sm text-gray-600">Interviews</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-4 text-center">
-            <div className="text-2xl font-bold text-green-600">{stats.offers}</div>
-            <div className="text-sm text-gray-600">Offers</div>
+          <CardHeader>
+            <CardTitle>Application Status Tracking</CardTitle>
+            <CardDescription>Real-time updates on your PM internship applications</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Tabs defaultValue="overview" className="space-y-4">
+              <TabsList>
+                <TabsTrigger value="overview">Overview</TabsTrigger>
+                <TabsTrigger value="updates">Recent Updates</TabsTrigger>
+                <TabsTrigger value="calendar">Interview Calendar</TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="overview" className="space-y-4">
+                {applications.map((app) => (
+                  <div key={app.id} className="border rounded-lg p-4">
+                    <div className="flex items-center justify-between mb-3">
+                      <div>
+                        <h3 className="font-semibold text-lg">{app.position}</h3>
+                        <div className="flex items-center space-x-2 text-gray-600">
+                          <Building2 className="h-4 w-4" />
+                          <span>{app.company}</span>
+                          <span>•</span>
+                          <span>{app.location}</span>
+                        </div>
+                      </div>
+                      <Badge className={getStatusColor(app.status)}>
+                        <div className="flex items-center space-x-1">
+                          {getStatusIcon(app.status)}
+                          <span className="capitalize">{app.status.replace('_', ' ')}</span>
+                        </div>
+                      </Badge>
+                    </div>
+                    
+                    <div className="mb-3">
+                      <div className="flex justify-between text-sm mb-1">
+                        <span>Progress</span>
+                        <span>{app.progress}%</span>
+                      </div>
+                      <Progress value={app.progress} className="h-2" />
+                    </div>
+
+                    {app.nextStep && (
+                      <div className="mb-3 p-2 bg-blue-50 rounded text-sm text-blue-700">
+                        Next: {app.nextStep}
+                      </div>
+                    )}
+
+                    {/* Document Status */}
+                    <div className="mb-3">
+                      <h4 className="text-sm font-medium mb-2">Required Documents</h4>
+                      <div className="flex flex-wrap gap-2">
+                        {Object.entries(app.documents).map(([doc, submitted]) => (
+                          <Badge 
+                            key={doc} 
+                            variant={submitted ? "default" : "secondary"}
+                            className={submitted ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}
+                          >
+                            {doc.charAt(0).toUpperCase() + doc.slice(1)}
+                            {submitted ? " ✓" : " ✗"}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="flex justify-between items-center text-sm text-gray-500">
+                      <span>Applied on {new Date(app.appliedDate).toLocaleDateString()}</span>
+                      <div className="flex space-x-2">
+                        <Button size="sm" variant="outline" onClick={() => handleSendMessage(app.id)}>
+                          <MessageSquare className="h-3 w-3 mr-1" />
+                          Message
+                        </Button>
+                        {app.interviewDate && (
+                          <Button size="sm" variant="outline" onClick={() => handleAddToCalendar(app)}>
+                            <Calendar className="h-3 w-3 mr-1" />
+                            Add to Calendar
+                          </Button>
+                        )}
+                        <Button size="sm" variant="outline">
+                          View Details
+                        </Button>
+                        <Button size="sm" variant="outline" onClick={() => handleWithdrawApplication(app.id)}>
+                          Withdraw
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </TabsContent>
+
+              <TabsContent value="updates" className="space-y-4">
+                <div className="space-y-3">
+                  {applications.flatMap(app => 
+                    app.updates.map(update => (
+                      <div key={update.id} className="flex items-start space-x-3 p-3 border rounded-lg">
+                        <div className="flex-shrink-0 mt-1">
+                          {getUpdateIcon(update.type)}
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-sm">{update.message}</p>
+                          <div className="flex items-center space-x-2 mt-1 text-xs text-gray-500">
+                            <span>{app.company}</span>
+                            <span>•</span>
+                            <span>{update.timestamp}</span>
+                          </div>
+                        </div>
+                      </div>
+                    ))
+                  ).sort((a, b) => new Date(b.key).getTime() - new Date(a.key).getTime())}
+                </div>
+              </TabsContent>
+
+              <TabsContent value="calendar" className="space-y-4">
+                <div className="space-y-3">
+                  {applications
+                    .filter(app => app.interviewDate)
+                    .map(app => (
+                      <div key={app.id} className="flex items-center justify-between p-4 border rounded-lg">
+                        <div className="flex items-center space-x-3">
+                          <Calendar className="h-8 w-8 text-purple-600" />
+                          <div>
+                            <h3 className="font-medium">{app.position}</h3>
+                            <p className="text-sm text-gray-600">{app.company}</p>
+                            <p className="text-sm text-gray-500">
+                              {app.interviewDate && new Date(app.interviewDate).toLocaleDateString()} 
+                              {app.nextStep?.includes('PM') && ` at ${app.nextStep.split('at ')[1]}`}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex space-x-2">
+                          <Button size="sm" variant="outline">
+                            <Calendar className="h-3 w-3 mr-1" />
+                            Add to Calendar
+                          </Button>
+                          <Button size="sm">
+                            Join Interview
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                </div>
+              </TabsContent>
+            </Tabs>
           </CardContent>
         </Card>
       </div>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Application Status Tracking</CardTitle>
-          <CardDescription>Real-time updates on your PM internship applications</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Tabs defaultValue="overview" className="space-y-4">
-            <TabsList>
-              <TabsTrigger value="overview">Overview</TabsTrigger>
-              <TabsTrigger value="updates">Recent Updates</TabsTrigger>
-              <TabsTrigger value="calendar">Interview Calendar</TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="overview" className="space-y-4">
-              {applications.map((app) => (
-                <div key={app.id} className="border rounded-lg p-4">
-                  <div className="flex items-center justify-between mb-3">
-                    <div>
-                      <h3 className="font-semibold text-lg">{app.position}</h3>
-                      <div className="flex items-center space-x-2 text-gray-600">
-                        <Building2 className="h-4 w-4" />
-                        <span>{app.company}</span>
-                        <span>•</span>
-                        <span>{app.location}</span>
-                      </div>
-                    </div>
-                    <Badge className={getStatusColor(app.status)}>
-                      <div className="flex items-center space-x-1">
-                        {getStatusIcon(app.status)}
-                        <span className="capitalize">{app.status.replace('_', ' ')}</span>
-                      </div>
-                    </Badge>
-                  </div>
-                  
-                  <div className="mb-3">
-                    <div className="flex justify-between text-sm mb-1">
-                      <span>Progress</span>
-                      <span>{app.progress}%</span>
-                    </div>
-                    <Progress value={app.progress} className="h-2" />
-                  </div>
-
-                  {app.nextStep && (
-                    <div className="mb-3 p-2 bg-blue-50 rounded text-sm text-blue-700">
-                      Next: {app.nextStep}
-                    </div>
-                  )}
-
-                  {/* Document Status */}
-                  <div className="mb-3">
-                    <h4 className="text-sm font-medium mb-2">Required Documents</h4>
-                    <div className="flex flex-wrap gap-2">
-                      {Object.entries(app.documents).map(([doc, submitted]) => (
-                        <Badge 
-                          key={doc} 
-                          variant={submitted ? "default" : "secondary"}
-                          className={submitted ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}
-                        >
-                          {doc.charAt(0).toUpperCase() + doc.slice(1)}
-                          {submitted ? " ✓" : " ✗"}
-                        </Badge>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="flex justify-between items-center text-sm text-gray-500">
-                    <span>Applied on {new Date(app.appliedDate).toLocaleDateString()}</span>
-                    <div className="flex space-x-2">
-                      <Button size="sm" variant="outline" onClick={() => handleSendMessage(app.id)}>
-                        <MessageSquare className="h-3 w-3 mr-1" />
-                        Message
-                      </Button>
-                      <Button size="sm" variant="outline">
-                        View Details
-                      </Button>
-                      <Button size="sm" variant="outline" onClick={() => handleWithdrawApplication(app.id)}>
-                        Withdraw
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </TabsContent>
-
-            <TabsContent value="updates" className="space-y-4">
-              <div className="space-y-3">
-                {applications.flatMap(app => 
-                  app.updates.map(update => (
-                    <div key={update.id} className="flex items-start space-x-3 p-3 border rounded-lg">
-                      <div className="flex-shrink-0 mt-1">
-                        {getUpdateIcon(update.type)}
-                      </div>
-                      <div className="flex-1">
-                        <p className="text-sm">{update.message}</p>
-                        <div className="flex items-center space-x-2 mt-1 text-xs text-gray-500">
-                          <span>{app.company}</span>
-                          <span>•</span>
-                          <span>{update.timestamp}</span>
-                        </div>
-                      </div>
-                    </div>
-                  ))
-                ).sort((a, b) => new Date(b.key).getTime() - new Date(a.key).getTime())}
-              </div>
-            </TabsContent>
-
-            <TabsContent value="calendar" className="space-y-4">
-              <div className="space-y-3">
-                {applications
-                  .filter(app => app.interviewDate)
-                  .map(app => (
-                    <div key={app.id} className="flex items-center justify-between p-4 border rounded-lg">
-                      <div className="flex items-center space-x-3">
-                        <Calendar className="h-8 w-8 text-purple-600" />
-                        <div>
-                          <h3 className="font-medium">{app.position}</h3>
-                          <p className="text-sm text-gray-600">{app.company}</p>
-                          <p className="text-sm text-gray-500">
-                            {app.interviewDate && new Date(app.interviewDate).toLocaleDateString()} 
-                            {app.nextStep?.includes('PM') && ` at ${app.nextStep.split('at ')[1]}`}
-                          </p>
-                        </div>
-                      </div>
-                      <div className="flex space-x-2">
-                        <Button size="sm" variant="outline">
-                          <Calendar className="h-3 w-3 mr-1" />
-                          Add to Calendar
-                        </Button>
-                        <Button size="sm">
-                          Join Interview
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
-              </div>
-            </TabsContent>
-          </Tabs>
-        </CardContent>
-      </Card>
-    </div>
+      
+      {/* Add to Calendar Modal */}
+      <AddToCalendarModal
+        isOpen={showAddToCalendar}
+        onClose={() => {
+          setShowAddToCalendar(false);
+          setSelectedEvent(null);
+        }}
+        event={selectedEvent}
+      />
+    </>
   );
 };
 
