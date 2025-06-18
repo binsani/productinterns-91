@@ -1,186 +1,338 @@
 
+import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
 import { 
+  BarChart3, 
   TrendingUp, 
-  TrendingDown, 
   Users, 
   Building2, 
-  FileText, 
-  DollarSign,
-  Eye,
-  Clock,
+  FileText,
+  Calendar,
   Download,
-  Calendar
+  Filter
 } from "lucide-react";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from "recharts";
 
 const Analytics = () => {
-  const metrics = [
-    { title: "Total Users", value: "2,847", change: "+12%", trend: "up", icon: Users },
-    { title: "Active Employers", value: "156", change: "+8%", trend: "up", icon: Building2 },
-    { title: "Job Applications", value: "1,234", change: "+23%", trend: "up", icon: FileText },
-    { title: "Monthly Revenue", value: "$45,231", change: "+18%", trend: "up", icon: DollarSign },
-    { title: "Page Views", value: "89,432", change: "-3%", trend: "down", icon: Eye },
-    { title: "Avg. Session Time", value: "12m 34s", change: "+5%", trend: "up", icon: Clock },
+  const [timeRange, setTimeRange] = useState("30d");
+  const [metric, setMetric] = useState("users");
+
+  // Sample data
+  const userGrowthData = [
+    { month: 'Jan', interns: 120, employers: 15 },
+    { month: 'Feb', interns: 180, employers: 22 },
+    { month: 'Mar', interns: 250, employers: 28 },
+    { month: 'Apr', interns: 320, employers: 35 },
+    { month: 'May', interns: 410, employers: 42 },
+    { month: 'Jun', interns: 520, employers: 48 }
   ];
 
-  const topPages = [
-    { page: "/jobs", views: "23,456", percentage: "32%" },
-    { page: "/dashboard", views: "18,293", percentage: "25%" },
-    { page: "/profile", views: "12,847", percentage: "18%" },
-    { page: "/applications", views: "9,234", percentage: "13%" },
-    { page: "/messages", views: "6,781", percentage: "9%" },
+  const applicationData = [
+    { day: 'Mon', applications: 45 },
+    { day: 'Tue', applications: 52 },
+    { day: 'Wed', applications: 38 },
+    { day: 'Thu', applications: 67 },
+    { day: 'Fri', applications: 58 },
+    { day: 'Sat', applications: 23 },
+    { day: 'Sun', applications: 18 }
   ];
 
-  const userActivity = [
-    { time: "9:00 AM", interns: 234, employers: 45 },
-    { time: "12:00 PM", interns: 567, employers: 89 },
-    { time: "3:00 PM", interns: 432, employers: 67 },
-    { time: "6:00 PM", interns: 198, employers: 34 },
-    { time: "9:00 PM", interns: 89, employers: 12 },
+  const industryData = [
+    { name: 'Technology', value: 35, color: '#3B82F6' },
+    { name: 'Healthcare', value: 20, color: '#10B981' },
+    { name: 'Finance', value: 18, color: '#F59E0B' },
+    { name: 'Education', value: 15, color: '#EF4444' },
+    { name: 'Other', value: 12, color: '#8B5CF6' }
   ];
+
+  const generateReport = () => {
+    // Mock report generation
+    console.log(`Generating ${metric} report for ${timeRange}`);
+  };
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
+      {/* Header with filters */}
+      <div className="flex justify-between items-center">
         <div>
           <h2 className="text-2xl font-bold">Analytics Dashboard</h2>
-          <p className="text-gray-600">Monitor platform performance and user insights</p>
+          <p className="text-gray-600">Monitor platform performance and user engagement</p>
         </div>
         <div className="flex space-x-2">
-          <Button variant="outline" className="flex items-center space-x-2">
-            <Calendar className="h-4 w-4" />
-            <span>Last 30 days</span>
-          </Button>
-          <Button variant="outline" className="flex items-center space-x-2">
-            <Download className="h-4 w-4" />
-            <span>Export</span>
+          <Select value={timeRange} onValueChange={setTimeRange}>
+            <SelectTrigger className="w-32">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="7d">Last 7 days</SelectItem>
+              <SelectItem value="30d">Last 30 days</SelectItem>
+              <SelectItem value="90d">Last 90 days</SelectItem>
+              <SelectItem value="1y">Last year</SelectItem>
+            </SelectContent>
+          </Select>
+          <Select value={metric} onValueChange={setMetric}>
+            <SelectTrigger className="w-40">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="users">User Metrics</SelectItem>
+              <SelectItem value="applications">Applications</SelectItem>
+              <SelectItem value="revenue">Revenue</SelectItem>
+              <SelectItem value="engagement">Engagement</SelectItem>
+            </SelectContent>
+          </Select>
+          <Button variant="outline" onClick={generateReport}>
+            <Download className="h-4 w-4 mr-2" />
+            Export Report
           </Button>
         </div>
       </div>
 
       {/* Key Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {metrics.map((metric, index) => {
-          const Icon = metric.icon;
-          return (
-            <Card key={index}>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">{metric.title}</CardTitle>
-                <Icon className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{metric.value}</div>
-                <div className="flex items-center space-x-1">
-                  {metric.trend === "up" ? (
-                    <TrendingUp className="h-3 w-3 text-green-600" />
-                  ) : (
-                    <TrendingDown className="h-3 w-3 text-red-600" />
-                  )}
-                  <p className={`text-xs ${metric.trend === "up" ? "text-green-600" : "text-red-600"}`}>
-                    {metric.change} from last month
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-          );
-        })}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total Users</CardTitle>
+            <Users className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">2,847</div>
+            <p className="text-xs text-muted-foreground">
+              <span className="text-green-600">+12%</span> from last month
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Active Employers</CardTitle>
+            <Building2 className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">156</div>
+            <p className="text-xs text-muted-foreground">
+              <span className="text-green-600">+8</span> new this week
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Applications</CardTitle>
+            <FileText className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">1,234</div>
+            <p className="text-xs text-muted-foreground">
+              <span className="text-green-600">+23%</span> this month
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Success Rate</CardTitle>
+            <TrendingUp className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">73%</div>
+            <p className="text-xs text-muted-foreground">
+              <span className="text-green-600">+2%</span> from last month
+            </p>
+          </CardContent>
+        </Card>
       </div>
 
-      {/* Charts and Data */}
+      {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Top Pages */}
+        {/* User Growth Chart */}
         <Card>
           <CardHeader>
-            <CardTitle>Top Pages</CardTitle>
-            <CardDescription>Most visited pages this month</CardDescription>
+            <CardTitle>User Growth</CardTitle>
+            <CardDescription>Monthly registration trends</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              {topPages.map((page, index) => (
-                <div key={index} className="flex items-center justify-between">
-                  <div>
-                    <p className="font-medium">{page.page}</p>
-                    <p className="text-sm text-gray-600">{page.views} views</p>
-                  </div>
-                  <Badge variant="secondary">{page.percentage}</Badge>
-                </div>
-              ))}
-            </div>
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={userGrowthData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="month" />
+                <YAxis />
+                <Tooltip />
+                <Bar dataKey="interns" fill="#3B82F6" name="Interns" />
+                <Bar dataKey="employers" fill="#10B981" name="Employers" />
+              </BarChart>
+            </ResponsiveContainer>
           </CardContent>
         </Card>
 
-        {/* User Activity */}
+        {/* Applications Chart */}
         <Card>
           <CardHeader>
-            <CardTitle>Daily User Activity</CardTitle>
-            <CardDescription>Active users throughout the day</CardDescription>
+            <CardTitle>Weekly Applications</CardTitle>
+            <CardDescription>Daily application submissions</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={300}>
+              <LineChart data={applicationData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="day" />
+                <YAxis />
+                <Tooltip />
+                <Line type="monotone" dataKey="applications" stroke="#3B82F6" strokeWidth={2} />
+              </LineChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Industry Distribution and Recent Activity */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Industry Distribution */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Industry Distribution</CardTitle>
+            <CardDescription>Employer breakdown by industry</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={300}>
+              <PieChart>
+                <Pie
+                  data={industryData}
+                  cx="50%"
+                  cy="50%"
+                  outerRadius={80}
+                  dataKey="value"
+                  label={({ name, value }) => `${name}: ${value}%`}
+                >
+                  {industryData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  ))}
+                </Pie>
+                <Tooltip />
+              </PieChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+
+        {/* Top Performing Content */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Platform Activity</CardTitle>
+            <CardDescription>Recent platform metrics</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {userActivity.map((activity, index) => (
-                <div key={index} className="flex items-center justify-between">
-                  <span className="text-sm font-medium">{activity.time}</span>
-                  <div className="flex space-x-4">
-                    <div className="flex items-center space-x-2">
-                      <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
-                      <span className="text-sm">{activity.interns} interns</span>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                      <span className="text-sm">{activity.employers} employers</span>
-                    </div>
-                  </div>
+              <div className="flex items-center justify-between p-3 border rounded-lg">
+                <div>
+                  <p className="font-medium">Most Popular Internship</p>
+                  <p className="text-sm text-gray-600">Product Management Intern at TechCorp</p>
                 </div>
-              ))}
+                <Badge>47 applications</Badge>
+              </div>
+              
+              <div className="flex items-center justify-between p-3 border rounded-lg">
+                <div>
+                  <p className="font-medium">Top Employer</p>
+                  <p className="text-sm text-gray-600">Innovation Labs</p>
+                </div>
+                <Badge variant="secondary">12 internships</Badge>
+              </div>
+              
+              <div className="flex items-center justify-between p-3 border rounded-lg">
+                <div>
+                  <p className="font-medium">Peak Application Time</p>
+                  <p className="text-sm text-gray-600">Tuesday 2:00 PM - 4:00 PM</p>
+                </div>
+                <Badge variant="outline">67 avg</Badge>
+              </div>
+              
+              <div className="flex items-center justify-between p-3 border rounded-lg">
+                <div>
+                  <p className="font-medium">Average Response Time</p>
+                  <p className="text-sm text-gray-600">Employer to candidate</p>
+                </div>
+                <Badge variant="outline">2.3 days</Badge>
+              </div>
             </div>
           </CardContent>
         </Card>
       </div>
 
-      {/* Recent Activity Summary */}
+      {/* Detailed Metrics Table */}
       <Card>
         <CardHeader>
-          <CardTitle>Platform Summary</CardTitle>
-          <CardDescription>Key insights and trends</CardDescription>
+          <CardTitle>Detailed Metrics</CardTitle>
+          <CardDescription>Comprehensive platform statistics</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <h4 className="font-medium mb-2">Top Performing Features</h4>
-              <ul className="space-y-2 text-sm">
-                <li className="flex justify-between">
-                  <span>Job Search</span>
-                  <span className="text-green-600">+15% engagement</span>
-                </li>
-                <li className="flex justify-between">
-                  <span>Application Tracking</span>
-                  <span className="text-green-600">+12% usage</span>
-                </li>
-                <li className="flex justify-between">
-                  <span>Messaging System</span>
-                  <span className="text-green-600">+8% activity</span>
-                </li>
-              </ul>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="space-y-3">
+              <h4 className="font-semibold text-sm text-gray-700">USER ENGAGEMENT</h4>
+              <div className="space-y-2">
+                <div className="flex justify-between">
+                  <span className="text-sm">Daily Active Users</span>
+                  <span className="text-sm font-medium">1,247</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-sm">Session Duration</span>
+                  <span className="text-sm font-medium">12m 34s</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-sm">Pages per Session</span>
+                  <span className="text-sm font-medium">4.2</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-sm">Bounce Rate</span>
+                  <span className="text-sm font-medium">34%</span>
+                </div>
+              </div>
             </div>
-            <div>
-              <h4 className="font-medium mb-2">Areas for Improvement</h4>
-              <ul className="space-y-2 text-sm">
-                <li className="flex justify-between">
-                  <span>Mobile Experience</span>
-                  <span className="text-orange-600">Needs attention</span>
-                </li>
-                <li className="flex justify-between">
-                  <span>Load Times</span>
-                  <span className="text-orange-600">3.2s avg</span>
-                </li>
-                <li className="flex justify-between">
-                  <span>User Onboarding</span>
-                  <span className="text-red-600">65% completion</span>
-                </li>
-              </ul>
+
+            <div className="space-y-3">
+              <h4 className="font-semibold text-sm text-gray-700">CONVERSION METRICS</h4>
+              <div className="space-y-2">
+                <div className="flex justify-between">
+                  <span className="text-sm">Application Rate</span>
+                  <span className="text-sm font-medium">23%</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-sm">Interview Rate</span>
+                  <span className="text-sm font-medium">12%</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-sm">Hiring Rate</span>
+                  <span className="text-sm font-medium">7%</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-sm">Employer Retention</span>
+                  <span className="text-sm font-medium">89%</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              <h4 className="font-semibold text-sm text-gray-700">TECHNICAL METRICS</h4>
+              <div className="space-y-2">
+                <div className="flex justify-between">
+                  <span className="text-sm">Page Load Time</span>
+                  <span className="text-sm font-medium">1.2s</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-sm">Uptime</span>
+                  <span className="text-sm font-medium">99.9%</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-sm">Error Rate</span>
+                  <span className="text-sm font-medium">0.03%</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-sm">API Response Time</span>
+                  <span className="text-sm font-medium">120ms</span>
+                </div>
+              </div>
             </div>
           </div>
         </CardContent>

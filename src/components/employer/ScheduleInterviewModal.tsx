@@ -52,6 +52,15 @@ const ScheduleInterviewModal = ({ isOpen, onClose, candidateName, position }: Sc
       description: `Interview with ${candidateName || 'candidate'} has been scheduled for ${format(date, 'PPP')} at ${time}.`,
     });
 
+    // Reset form
+    setDate(undefined);
+    setTime("");
+    setDuration("45");
+    setType("video");
+    setLocation("");
+    setInterviewer("");
+    setNotes("");
+    
     onClose();
   };
 
@@ -88,6 +97,7 @@ const ScheduleInterviewModal = ({ isOpen, onClose, candidateName, position }: Sc
                     selected={date}
                     onSelect={setDate}
                     initialFocus
+                    disabled={(date) => date < new Date()}
                   />
                 </PopoverContent>
               </Popover>

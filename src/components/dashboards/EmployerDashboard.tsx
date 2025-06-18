@@ -23,17 +23,17 @@ import {
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import ApplicantManagement from "@/components/employer/ApplicantManagement";
 import { useAuthStore } from "@/stores/authStore";
-import JobPostingModal from "@/components/employer/JobPostingModal";
-import JobPostingsManagement from "@/components/employer/JobPostingsManagement";
+import InternshipPostingModal from "@/components/employer/InternshipPostingModal";
+import InternshipPostingsManagement from "@/components/employer/InternshipPostingsManagement";
 import InterviewScheduling from "@/components/employer/InterviewScheduling";
 import AnalyticsReporting from "@/components/employer/AnalyticsReporting";
 import BillingManagement from "@/components/employer/BillingManagement";
 import Messages from "@/components/employer/Messages";
 import CompanyProfileEditor from "@/components/employer/CompanyProfileEditor";
-import SettingsPage from "@/components/employer/Settings";
+import EmployerProfileSettings from "@/components/employer/EmployerProfileSettings";
 import StatsCard from "@/components/shared/StatsCard";
 import WelcomeHero from "@/components/shared/WelcomeHero";
-import JobCard from "@/components/shared/JobCard";
+import InternshipCard from "@/components/shared/InternshipCard";
 import ApplicationCard from "@/components/shared/ApplicationCard";
 import ScheduleInterviewModal from "@/components/employer/ScheduleInterviewModal";
 
@@ -155,12 +155,12 @@ const EmployerDashboard = () => {
                 location: "New York, NY"
               },
             ].map((internship) => (
-              <JobCard
+              <InternshipCard
                 key={internship.id}
                 id={internship.id}
                 title={internship.title}
                 location={internship.location}
-                type="Full-time"
+                type="Internship"
                 applications={internship.applications}
                 views={internship.views}
                 posted={internship.posted}
@@ -221,6 +221,7 @@ const EmployerDashboard = () => {
                 applied={applicant.applied}
                 match={applicant.match}
                 onReview={handleApplicantReview}
+                onScheduleInterview={() => handleScheduleInterview(applicant.name, applicant.position)}
                 variant="applicant"
               />
             ))}
@@ -239,7 +240,7 @@ const EmployerDashboard = () => {
       case "company":
         return renderCompanyProfile();
       case "postings":
-        return <JobPostingsManagement />;
+        return <InternshipPostingsManagement />;
       case "applicants":
         return <ApplicantManagement />;
       case "messages":
@@ -251,7 +252,7 @@ const EmployerDashboard = () => {
       case "billing":
         return <BillingManagement />;
       case "settings":
-        return <SettingsPage />;
+        return <EmployerProfileSettings />;
       default:
         return (
           <Card>
@@ -278,7 +279,7 @@ const EmployerDashboard = () => {
         {renderContent()}
       </DashboardLayout>
       
-      <JobPostingModal 
+      <InternshipPostingModal 
         isOpen={isInternshipPostingModalOpen} 
         onClose={() => setIsInternshipPostingModalOpen(false)} 
       />

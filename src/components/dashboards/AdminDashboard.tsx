@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -85,7 +86,7 @@ const AdminDashboard = () => {
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Job Applications</CardTitle>
+            <CardTitle className="text-sm font-medium">Internship Applications</CardTitle>
             <FileText className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -116,7 +117,7 @@ const AdminDashboard = () => {
             <div className="space-y-4">
               {[
                 { name: "Sarah Johnson", type: "intern", action: "Registered", time: "2 minutes ago" },
-                { name: "TechCorp Inc", type: "employer", action: "Posted Job", time: "15 minutes ago" },
+                { name: "TechCorp Inc", type: "employer", action: "Posted Internship", time: "15 minutes ago" },
                 { name: "Alex Chen", type: "intern", action: "Applied", time: "1 hour ago" },
                 { name: "StartupX", type: "employer", action: "Scheduled Interview", time: "2 hours ago" },
                 { name: "Maria Garcia", type: "intern", action: "Completed Assessment", time: "3 hours ago" },
@@ -151,10 +152,10 @@ const AdminDashboard = () => {
           <CardContent>
             <div className="space-y-4">
               {[
-                { type: "Job Posting", company: "NewTech Solutions", status: "pending", priority: "high" },
+                { type: "Internship Posting", company: "NewTech Solutions", status: "pending", priority: "high" },
                 { type: "User Profile", user: "John Smith", status: "flagged", priority: "medium" },
                 { type: "Company Profile", company: "Innovation Labs", status: "pending", priority: "low" },
-                { type: "Job Posting", company: "Growth Corp", status: "review", priority: "medium" },
+                { type: "Internship Posting", company: "Growth Corp", status: "review", priority: "medium" },
               ].map((item, index) => (
                 <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
                   <div>
@@ -219,66 +220,6 @@ const AdminDashboard = () => {
               <p className="text-sm text-gray-600">No threats detected</p>
               <p className="text-xs text-gray-500">Last scan: 1 hour ago</p>
             </div>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
-  );
-
-  const renderUserManagement = () => (
-    <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>User Overview</CardTitle>
-          <CardDescription>Manage registered users and their permissions</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-            <div className="text-center p-4 border rounded-lg">
-              <div className="text-2xl font-bold text-blue-600">1,892</div>
-              <div className="text-sm text-gray-600">Active Interns</div>
-            </div>
-            <div className="text-center p-4 border rounded-lg">
-              <div className="text-2xl font-bold text-green-600">156</div>
-              <div className="text-sm text-gray-600">Active Employers</div>
-            </div>
-            <div className="text-center p-4 border rounded-lg">
-              <div className="text-2xl font-bold text-purple-600">799</div>
-              <div className="text-sm text-gray-600">Total Registrations This Month</div>
-            </div>
-          </div>
-
-          <div className="space-y-3">
-            <h3 className="font-medium">Recent User Registrations</h3>
-            {[
-              { name: "Emily Davis", email: "emily@email.com", role: "intern", status: "active", joined: "2 hours ago" },
-              { name: "TechStart Inc", email: "hr@techstart.com", role: "employer", status: "pending", joined: "5 hours ago" },
-              { name: "Michael Brown", email: "michael@email.com", role: "intern", status: "active", joined: "1 day ago" },
-              { name: "Innovation Corp", email: "jobs@innovation.com", role: "employer", status: "active", joined: "2 days ago" },
-            ].map((user, index) => (
-              <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
-                <div className="flex items-center space-x-3">
-                  <Avatar>
-                    <AvatarImage src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${user.email}`} />
-                    <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <p className="font-medium">{user.name}</p>
-                    <p className="text-sm text-gray-600">{user.email}</p>
-                  </div>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Badge variant={user.role === "intern" ? "default" : "secondary"}>
-                    {user.role}
-                  </Badge>
-                  <Badge variant={user.status === "active" ? "outline" : "secondary"}>
-                    {user.status}
-                  </Badge>
-                  <span className="text-xs text-gray-500">{user.joined}</span>
-                  <Button size="sm" variant="outline">Manage</Button>
-                </div>
-              </div>
-            ))}
           </div>
         </CardContent>
       </Card>
