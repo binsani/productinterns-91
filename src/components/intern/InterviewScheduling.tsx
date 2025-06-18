@@ -44,18 +44,18 @@ const InterviewScheduling = () => {
   const [showCalendarModal, setShowCalendarModal] = useState(false);
   const [selectedInterview, setSelectedInterview] = useState<Interview | null>(null);
 
-  const interviews = [
+  const [interviews, setInterviews] = useState<Interview[]>([
     {
       id: "1",
       company: "TechCorp",
       position: "Product Management Intern",
-      type: "video",
+      type: "video" as const,
       date: "2024-01-25",
       time: "2:00 PM",
       duration: 60,
       meetingLink: "https://zoom.us/j/123456789",
       interviewers: ["Sarah Johnson - Senior PM", "Mike Chen - Engineering Manager"],
-      status: "confirmed",
+      status: "confirmed" as const,
       preparation: {
         materials: ["Resume", "Portfolio", "Case Study Prep"],
         tips: [
@@ -70,12 +70,12 @@ const InterviewScheduling = () => {
       id: "2",
       company: "StartupX",
       position: "Junior PM Intern",
-      type: "phone",
+      type: "phone" as const,
       date: "2024-01-28",
       time: "10:00 AM",
       duration: 30,
       interviewers: ["Alex Rodriguez - Head of Product"],
-      status: "scheduled",
+      status: "scheduled" as const,
       preparation: {
         materials: ["Resume", "Questions list"],
         tips: [
@@ -90,7 +90,7 @@ const InterviewScheduling = () => {
       id: "3",
       company: "BigTech Inc",
       position: "PM Summer Intern",
-      type: "panel",
+      type: "panel" as const,
       date: "2024-02-02",
       time: "11:00 AM",
       duration: 90,
@@ -100,7 +100,7 @@ const InterviewScheduling = () => {
         "David Smith - Senior PM",
         "Lisa Chen - PM Manager"
       ],
-      status: "scheduled",
+      status: "scheduled" as const,
       preparation: {
         materials: ["Resume", "Portfolio", "ID", "Transcript"],
         tips: [
@@ -111,7 +111,7 @@ const InterviewScheduling = () => {
         ]
       }
     }
-  ];
+  ]);
 
   const getStatusColor = (status: string) => {
     switch (status) {
