@@ -4,7 +4,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
 import JobCard from "@/components/shared/JobCard";
 
-const RecommendedJobs = () => {
+const RecommendedInternships = () => {
   const { toast } = useToast();
   const [savedInternships, setSavedInternships] = useState<Set<number>>(new Set());
   const [appliedInternships, setAppliedInternships] = useState<Set<number>>(new Set());
@@ -89,4 +89,4 @@ const RecommendedJobs = () => {
   );
 };
 
-export default RecommendedJobs;
+export default RecommendedInternships;

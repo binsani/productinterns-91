@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -39,7 +40,7 @@ import ScheduleInterviewModal from "@/components/employer/ScheduleInterviewModal
 const EmployerDashboard = () => {
   const { user } = useAuthStore();
   const [activeTab, setActiveTab] = useState("overview");
-  const [isJobPostingModalOpen, setIsJobPostingModalOpen] = useState(false);
+  const [isInternshipPostingModalOpen, setIsInternshipPostingModalOpen] = useState(false);
   const [isScheduleInterviewModalOpen, setIsScheduleInterviewModalOpen] = useState(false);
   const [selectedCandidate, setSelectedCandidate] = useState<{name: string, position: string} | null>(null);
 
@@ -55,11 +56,11 @@ const EmployerDashboard = () => {
     { id: "settings", label: "Settings", icon: Settings },
   ];
 
-  const handleJobView = (id: number) => {
+  const handleInternshipView = (id: number) => {
     setActiveTab("applicants");
   };
 
-  const handleJobEdit = (id: number) => {
+  const handleInternshipEdit = (id: number) => {
     console.log("Edit PM internship:", id);
   };
 
@@ -118,7 +119,7 @@ const EmployerDashboard = () => {
             <CardTitle>Active PM Internship Postings</CardTitle>
             <CardDescription>Manage your current product management internship listings</CardDescription>
           </div>
-          <Button onClick={() => setIsJobPostingModalOpen(true)}>
+          <Button onClick={() => setIsInternshipPostingModalOpen(true)}>
             <Plus className="h-4 w-4 mr-2" />
             Post New PM Internship
           </Button>
@@ -164,8 +165,8 @@ const EmployerDashboard = () => {
                 views={internship.views}
                 posted={internship.posted}
                 status={internship.status}
-                onView={handleJobView}
-                onEdit={handleJobEdit}
+                onView={handleInternshipView}
+                onEdit={handleInternshipEdit}
                 variant="posting"
               />
             ))}
@@ -278,8 +279,8 @@ const EmployerDashboard = () => {
       </DashboardLayout>
       
       <JobPostingModal 
-        isOpen={isJobPostingModalOpen} 
-        onClose={() => setIsJobPostingModalOpen(false)} 
+        isOpen={isInternshipPostingModalOpen} 
+        onClose={() => setIsInternshipPostingModalOpen(false)} 
       />
       
       <ScheduleInterviewModal

@@ -26,9 +26,9 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import JobPostingModal from "./JobPostingModal";
 
-const JobPostingsManagement = () => {
+const InternshipPostingsManagement = () => {
   const { toast } = useToast();
-  const [isJobPostingModalOpen, setIsJobPostingModalOpen] = useState(false);
+  const [isInternshipPostingModalOpen, setIsInternshipPostingModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [internshipPostings, setInternshipPostings] = useState([
     { 
@@ -109,7 +109,7 @@ const JobPostingsManagement = () => {
               <CardTitle>PM Internship Postings Management</CardTitle>
               <CardDescription>Manage all your product management internship postings and track their performance</CardDescription>
             </div>
-            <Button onClick={() => setIsJobPostingModalOpen(true)}>
+            <Button onClick={() => setIsInternshipPostingModalOpen(true)}>
               <Plus className="h-4 w-4 mr-2" />
               Post New PM Internship
             </Button>
@@ -207,11 +207,11 @@ const JobPostingsManagement = () => {
       </div>
 
       <JobPostingModal 
-        isOpen={isJobPostingModalOpen} 
-        onClose={() => setIsJobPostingModalOpen(false)} 
+        isOpen={isInternshipPostingModalOpen} 
+        onClose={() => setIsInternshipPostingModalOpen(false)} 
       />
     </>
   );
 };
 
-export default JobPostingsManagement;
+export default InternshipPostingsManagement;

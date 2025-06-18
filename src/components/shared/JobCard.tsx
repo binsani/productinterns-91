@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { MapPin, Clock, Eye, Users } from "lucide-react";
 
-interface JobCardProps {
+interface InternshipCardProps {
   id: number;
   title: string;
   company?: string;
@@ -25,7 +25,7 @@ interface JobCardProps {
   variant?: "recommendation" | "posting";
 }
 
-const JobCard = ({
+const InternshipCard = ({
   id,
   title,
   company,
@@ -44,7 +44,7 @@ const JobCard = ({
   isApplied,
   isSaved,
   variant = "recommendation"
-}: JobCardProps) => {
+}: InternshipCardProps) => {
   if (variant === "posting") {
     return (
       <div className="flex items-center justify-between p-4 border rounded-lg">
@@ -109,4 +109,4 @@ const JobCard = ({
   );
 };
 
-export default JobCard;
+export default InternshipCard;

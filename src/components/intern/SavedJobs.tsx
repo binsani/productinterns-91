@@ -7,7 +7,7 @@ import { Bookmark, Trash2 } from "lucide-react";
 import JobCard from "@/components/shared/JobCard";
 import { useToast } from "@/hooks/use-toast";
 
-const SavedJobs = () => {
+const SavedInternships = () => {
   const [savedInternships, setSavedInternships] = useState([1, 2, 3]);
   const [appliedInternships, setAppliedInternships] = useState<number[]>([]);
   const { toast } = useToast();
@@ -128,4 +128,4 @@ const SavedJobs = () => {
   );
 };
 
-export default SavedJobs;
+export default SavedInternships;

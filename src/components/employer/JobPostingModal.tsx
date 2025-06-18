@@ -21,12 +21,12 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 
-interface JobPostingModalProps {
+interface InternshipPostingModalProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
-const JobPostingModal = ({ isOpen, onClose }: JobPostingModalProps) => {
+const InternshipPostingModal = ({ isOpen, onClose }: InternshipPostingModalProps) => {
   const { toast } = useToast();
   const [formData, setFormData] = useState({
     title: "",
@@ -159,4 +159,4 @@ const JobPostingModal = ({ isOpen, onClose }: JobPostingModalProps) => {
   );
 };
 
-export default JobPostingModal;
+export default InternshipPostingModal;
