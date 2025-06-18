@@ -39,6 +39,8 @@ import {
   UserX,
   Plus
 } from "lucide-react";
+import UserProfileModal from "./UserProfileModal";
+import MessageModal from "./MessageModal";
 
 interface User {
   id: string;
@@ -73,6 +75,12 @@ const UserManagement = () => {
     role: "intern",
     companyName: ""
   });
+
+  const [selectedUserForProfile, setSelectedUserForProfile] = useState<User | null>(null);
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+  const [profileModalMode, setProfileModalMode] = useState<"view" | "edit">("view");
+  const [selectedUserForMessage, setSelectedUserForMessage] = useState<User | null>(null);
+  const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
 
   const [users, setUsers] = useState<User[]>([
     {
@@ -194,6 +202,84 @@ const UserManagement = () => {
       case "admin": return <Shield className="h-3 w-3" />;
       default: return <Users className="h-3 w-3" />;
     }
+  };
+
+  const handleViewProfile = (user: User) => {
+    setSelectedUserForProfile(user);
+    setProfileModalMode("view");
+    setIsProfileModalOpen(true);
+  };
+
+  const handleSendMessage = (user: User) => {
+    setSelectedUserForMessage(user);
+    setIsMessageModalOpen(true);
+  };
+
+  const handleSuspendUser = async (userId: string) => {
+    if (!confirm("Are you sure you want to suspend this user?")) return;
+    
+    try {
+      setUsers(prev => prev.map(user => 
+        user.id === userId ? { ...user, status: "suspended" as const } : user
+      ));
+      console.log("User suspended:", userId);
+      alert("User suspended successfully!");
+    } catch (error) {
+      console.error("Failed to suspend user:", error);
+      alert("Failed to suspend user. Please try again.");
+    }
+  };
+
+  const handleReactivateUser = async (userId: string) => {
+    try {
+      setUsers(prev => prev.map(user => 
+        user.id === userId ? { ...user, status: "active" as const } : user
+      ));
+      console.log("User reactivated:", userId);
+      alert("User reactivated successfully!");
+    } catch (error) {
+      console.error("Failed to reactivate user:", error);
+      alert("Failed to reactivate user. Please try again.");
+    }
+  };
+
+  const handleApproveUser = async (userId: string) => {
+    try {
+      setUsers(prev => prev.map(user => 
+        user.id === userId ? { ...user, status: "active" as const, verified: true } : user
+      ));
+      console.log("User approved:", userId);
+      alert("User approved successfully!");
+    } catch (error) {
+      console.error("Failed to approve user:", error);
+      alert("Failed to approve user. Please try again.");
+    }
+  };
+
+  const handleDeleteUser = async (userId: string) => {
+    if (!confirm("Are you sure you want to delete this user? This action cannot be undone.")) return;
+    
+    try {
+      setUsers(prev => prev.filter(user => user.id !== userId));
+      console.log("User deleted:", userId);
+      alert("User deleted successfully!");
+    } catch (error) {
+      console.error("Failed to delete user:", error);
+      alert("Failed to delete user. Please try again.");
+    }
+  };
+
+  const handleSaveProfile = (updatedUser: User) => {
+    setUsers(prev => prev.map(user => 
+      user.id === updatedUser.id ? updatedUser : user
+    ));
+    console.log("Profile updated:", updatedUser);
+    alert("Profile updated successfully!");
+  };
+
+  const handleSendMessageAction = (message: { to: string; subject: string; body: string }) => {
+    console.log("Message sent:", message);
+    // In a real app, this would send the message via API
   };
 
   const filteredUsers = users.filter(user => {
@@ -445,24 +531,40 @@ const UserManagement = () => {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="bg-white">
-                        <DropdownMenuItem>View Profile</DropdownMenuItem>
-                        <DropdownMenuItem>Send Message</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleViewProfile(user)}>
+                          View Profile
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleSendMessage(user)}>
+                          Send Message
+                        </DropdownMenuItem>
                         {user.status === "pending" && (
-                          <DropdownMenuItem className="text-green-600">
+                          <DropdownMenuItem 
+                            className="text-green-600"
+                            onClick={() => handleApproveUser(user.id)}
+                          >
                             Approve User
                           </DropdownMenuItem>
                         )}
                         {user.status === "active" && (
-                          <DropdownMenuItem className="text-yellow-600">
+                          <DropdownMenuItem 
+                            className="text-yellow-600"
+                            onClick={() => handleSuspendUser(user.id)}
+                          >
                             Suspend User
                           </DropdownMenuItem>
                         )}
                         {user.status === "suspended" && (
-                          <DropdownMenuItem className="text-green-600">
+                          <DropdownMenuItem 
+                            className="text-green-600"
+                            onClick={() => handleReactivateUser(user.id)}
+                          >
                             Reactivate User
                           </DropdownMenuItem>
                         )}
-                        <DropdownMenuItem className="text-red-600">
+                        <DropdownMenuItem 
+                          className="text-red-600"
+                          onClick={() => handleDeleteUser(user.id)}
+                        >
                           Delete User
                         </DropdownMenuItem>
                       </DropdownMenuContent>
@@ -474,6 +576,29 @@ const UserManagement = () => {
           </div>
         </CardContent>
       </Card>
+
+      {/* Profile Modal */}
+      <UserProfileModal
+        user={selectedUserForProfile}
+        isOpen={isProfileModalOpen}
+        onClose={() => {
+          setIsProfileModalOpen(false);
+          setSelectedUserForProfile(null);
+        }}
+        onSave={handleSaveProfile}
+        mode={profileModalMode}
+      />
+
+      {/* Message Modal */}
+      <MessageModal
+        user={selectedUserForMessage}
+        isOpen={isMessageModalOpen}
+        onClose={() => {
+          setIsMessageModalOpen(false);
+          setSelectedUserForMessage(null);
+        }}
+        onSend={handleSendMessageAction}
+      />
     </div>
   );
 };

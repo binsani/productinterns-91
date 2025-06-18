@@ -1,4 +1,3 @@
-
 import { ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -37,6 +36,12 @@ const DashboardLayout = ({
   children 
 }: DashboardLayoutProps) => {
   const { user, logout } = useAuthStore();
+
+  const handleProfileSettings = () => {
+    console.log("Opening profile settings...");
+    // In a real app, this would open a profile settings modal or navigate to settings page
+    alert("Profile settings functionality will be available soon!");
+  };
 
   const getRoleColor = (role: string) => {
     switch (role) {
@@ -93,7 +98,7 @@ const DashboardLayout = ({
                   <User className="mr-2 h-4 w-4" />
                   <span>Profile</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem>
+                <DropdownMenuItem onClick={handleProfileSettings}>
                   <Settings className="mr-2 h-4 w-4" />
                   <span>Settings</span>
                 </DropdownMenuItem>

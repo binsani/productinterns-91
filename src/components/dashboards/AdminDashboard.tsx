@@ -28,6 +28,7 @@ import ContentModeration from "@/components/admin/ContentModeration";
 import Support from "@/components/admin/Support";
 import PlatformSettings from "@/components/admin/PlatformSettings";
 import Subscriptions from "@/components/admin/Subscriptions";
+import SecuritySettings from "@/components/admin/SecuritySettings";
 
 const AdminDashboard = () => {
   const { user } = useAuthStore();
@@ -298,6 +299,8 @@ const AdminDashboard = () => {
         return <Subscriptions />;
       case "support":
         return <Support />;
+      case "security":
+        return <SecuritySettings />;
       case "settings":
         return <PlatformSettings />;
       default:
