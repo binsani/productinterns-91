@@ -16,6 +16,7 @@ interface ApplicationCardProps {
   applied?: string;
   match?: number;
   onReview?: (id: number, name: string) => void;
+  onScheduleInterview?: () => void;
   variant?: "recent" | "applicant";
 }
 
@@ -31,6 +32,7 @@ const ApplicationCard = ({
   applied,
   match,
   onReview,
+  onScheduleInterview,
   variant = "recent"
 }: ApplicationCardProps) => {
   if (variant === "applicant" && name && university && skills && applied && match && onReview && id) {
@@ -57,6 +59,11 @@ const ApplicationCard = ({
         <div className="flex items-center space-x-2">
           <span className="text-sm text-gray-500">{applied}</span>
           <Button size="sm" onClick={() => onReview(id, name)}>Review</Button>
+          {onScheduleInterview && (
+            <Button size="sm" variant="outline" onClick={onScheduleInterview}>
+              Schedule Interview
+            </Button>
+          )}
         </div>
       </div>
     );
