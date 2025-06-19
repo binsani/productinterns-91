@@ -4,9 +4,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Trash2, Download, Eye } from "lucide-react";
+import { Plus, Trash2, Download, Eye, ArrowLeft } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import ResumePreviewModal from "./ResumePreviewModal";
+import ResumeTemplates from "./ResumeTemplates";
 
 interface Experience {
   id: string;
@@ -52,6 +53,9 @@ interface ResumeData {
 const ResumeBuilder = () => {
   const { toast } = useToast();
   const [showPreview, setShowPreview] = useState(false);
+  const [showTemplates, setShowTemplates] = useState(true);
+  const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
+  
   const [resumeData, setResumeData] = useState<ResumeData>({
     personalInfo: {
       name: "",
@@ -159,6 +163,20 @@ const ResumeBuilder = () => {
     }));
   };
 
+  const handleTemplateSelect = (templateId: string) => {
+    setSelectedTemplate(templateId);
+    setShowTemplates(false);
+    toast({
+      title: "Template Selected",
+      description: "You can now customize your resume with the selected template."
+    });
+  };
+
+  const handleBackToTemplates = () => {
+    setShowTemplates(true);
+    setSelectedTemplate(null);
+  };
+
   const handlePreview = () => {
     setShowPreview(true);
   };
@@ -170,13 +188,29 @@ const ResumeBuilder = () => {
     });
   };
 
+  if (showTemplates) {
+    return (
+      <div className="space-y-6">
+        <ResumeTemplates onSelectTemplate={handleTemplateSelect} />
+      </div>
+    );
+  }
+
   return (
     <>
       <div className="space-y-6">
         <Card>
-          <CardHeader>
-            <CardTitle>PM Resume Builder</CardTitle>
-            <CardDescription>Create a product management focused resume that highlights your PM skills and experience</CardDescription>
+          <CardHeader className="flex flex-row items-center justify-between">
+            <div>
+              <CardTitle className="flex items-center">
+                <Button variant="ghost" size="sm" onClick={handleBackToTemplates} className="mr-2">
+                  <ArrowLeft className="h-4 w-4" />
+                </Button>
+                PM Resume Builder
+              </CardTitle>
+              <CardDescription>Create a product management focused resume that highlights your PM skills and experience</CardDescription>
+            </div>
+            <Badge variant="secondary">Template: {selectedTemplate}</Badge>
           </CardHeader>
         </Card>
 
@@ -434,6 +468,9 @@ const ResumeBuilder = () => {
               <Button onClick={handleDownload}>
                 <Download className="h-4 w-4 mr-2" />
                 Download PDF
+              </Button>
+              <Button variant="outline" onClick={handleBackToTemplates}>
+                Change Template
               </Button>
             </div>
           </CardContent>
