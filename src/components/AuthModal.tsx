@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuthStore, UserRole } from "@/stores/authStore";
 import { useToast } from "@/hooks/use-toast";
@@ -31,15 +31,27 @@ const AuthModal = ({ isOpen, onClose, mode, onModeChange }: AuthModalProps) => {
     e.preventDefault();
     
     try {
+      let result;
       if (mode === "signin") {
-        await login(email, password, role);
+        result = await login(email, password);
       } else {
-        await signup(email, password, name, role, companyName);
+        result = await signup(email, password, name, role, companyName);
+      }
+      
+      if (result.error) {
+        toast({
+          title: "Error",
+          description: result.error,
+          variant: "destructive",
+        });
+        return;
       }
       
       toast({
         title: mode === "signin" ? "Welcome back!" : "Account created!",
-        description: mode === "signin" ? "You've successfully signed in." : "Your account has been created successfully.",
+        description: mode === "signin" 
+          ? "You've successfully signed in." 
+          : "Please check your email to verify your account.",
       });
       
       onClose();
@@ -121,25 +133,6 @@ const AuthModal = ({ isOpen, onClose, mode, onModeChange }: AuthModalProps) => {
                   placeholder="Enter your password"
                   required
                 />
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="role">I am a</Label>
-                <Select value={role} onValueChange={(value: UserRole) => setRole(value)}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select your role" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {roleOptions.map((option) => (
-                      <SelectItem key={option.value} value={option.value}>
-                        <div className="flex items-center space-x-2">
-                          <option.icon className="h-4 w-4" />
-                          <span>{option.label}</span>
-                        </div>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
               </div>
               
               <Button type="submit" className="w-full" disabled={isLoading}>

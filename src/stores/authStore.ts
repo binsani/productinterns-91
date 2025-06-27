@@ -1,77 +1,222 @@
 
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { supabase } from '@/integrations/supabase/client';
+import type { User, Session } from '@supabase/supabase-js';
 
 export type UserRole = 'intern' | 'employer' | 'admin';
 
-export interface User {
+export interface UserProfile {
   id: string;
   email: string;
   name: string;
   role: UserRole;
-  avatar?: string;
-  companyName?: string;
+  avatar_url?: string;
+  company_name?: string;
   position?: string;
+  bio?: string;
+  skills?: string[];
+  locations?: string[];
+  verified?: boolean;
 }
 
 interface AuthState {
   user: User | null;
+  profile: UserProfile | null;
+  session: Session | null;
   isLoading: boolean;
-  login: (email: string, password: string, role: UserRole) => Promise<void>;
-  signup: (email: string, password: string, name: string, role: UserRole, companyName?: string) => Promise<void>;
-  updateUser: (userData: User) => void;
-  logout: () => void;
+  login: (email: string, password: string) => Promise<{ error?: string }>;
+  signup: (email: string, password: string, name: string, role: UserRole, companyName?: string) => Promise<{ error?: string }>;
+  logout: () => Promise<void>;
+  updateProfile: (profileData: Partial<UserProfile>) => Promise<{ error?: string }>;
+  fetchProfile: () => Promise<void>;
+  initialize: () => void;
 }
 
 export const useAuthStore = create<AuthState>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       user: null,
+      profile: null,
+      session: null,
       isLoading: false,
-      login: async (email: string, password: string, role: UserRole) => {
-        set({ isLoading: true });
-        // Simulate API call
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        
-        // Mock user data
-        const user: User = {
-          id: Math.random().toString(36).substr(2, 9),
-          email,
-          name: email.split('@')[0].replace(/[^a-zA-Z ]/g, '').replace(/\b\w/g, l => l.toUpperCase()),
-          role,
-          avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${email}`,
-          companyName: role === 'employer' ? 'Tech Company Inc.' : undefined,
-          position: role === 'intern' ? 'Product Management Intern' : role === 'employer' ? 'Hiring Manager' : 'Platform Administrator'
-        };
-        
-        set({ user, isLoading: false });
+
+      initialize: () => {
+        // Set up auth state listener
+        const { data: { subscription } } = supabase.auth.onAuthStateChange(
+          async (event, session) => {
+            console.log('Auth state changed:', event, session?.user?.email);
+            set({ 
+              session, 
+              user: session?.user ?? null,
+              isLoading: false 
+            });
+            
+            // Fetch profile when user logs in
+            if (session?.user && event === 'SIGNED_IN') {
+              setTimeout(() => {
+                get().fetchProfile();
+              }, 0);
+            } else if (event === 'SIGNED_OUT') {
+              set({ profile: null });
+            }
+          }
+        );
+
+        // Check for existing session
+        supabase.auth.getSession().then(({ data: { session } }) => {
+          console.log('Initial session check:', session?.user?.email);
+          set({ 
+            session, 
+            user: session?.user ?? null,
+            isLoading: false 
+          });
+          
+          if (session?.user) {
+            get().fetchProfile();
+          }
+        });
+
+        return () => subscription.unsubscribe();
       },
+
+      login: async (email: string, password: string) => {
+        set({ isLoading: true });
+        try {
+          const { data, error } = await supabase.auth.signInWithPassword({
+            email,
+            password,
+          });
+
+          if (error) {
+            set({ isLoading: false });
+            return { error: error.message };
+          }
+
+          console.log('Login successful:', data.user?.email);
+          return {};
+        } catch (error) {
+          set({ isLoading: false });
+          return { error: 'An unexpected error occurred' };
+        }
+      },
+
       signup: async (email: string, password: string, name: string, role: UserRole, companyName?: string) => {
         set({ isLoading: true });
-        // Simulate API call
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        
-        const user: User = {
-          id: Math.random().toString(36).substr(2, 9),
-          email,
-          name,
-          role,
-          avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${email}`,
-          companyName: role === 'employer' ? companyName : undefined,
-          position: role === 'intern' ? 'Product Management Intern' : role === 'employer' ? 'Hiring Manager' : 'Platform Administrator'
-        };
-        
-        set({ user, isLoading: false });
+        try {
+          const redirectUrl = `${window.location.origin}/`;
+          
+          const { data, error } = await supabase.auth.signUp({
+            email,
+            password,
+            options: {
+              emailRedirectTo: redirectUrl,
+              data: {
+                name,
+                role,
+                company_name: companyName,
+              },
+            },
+          });
+
+          if (error) {
+            set({ isLoading: false });
+            return { error: error.message };
+          }
+
+          console.log('Signup successful:', data.user?.email);
+          set({ isLoading: false });
+          return {};
+        } catch (error) {
+          set({ isLoading: false });
+          return { error: 'An unexpected error occurred' };
+        }
       },
-      updateUser: (userData: User) => {
-        set({ user: userData });
+
+      logout: async () => {
+        set({ isLoading: true });
+        try {
+          const { error } = await supabase.auth.signOut();
+          if (error) {
+            console.error('Logout error:', error.message);
+          }
+          set({ 
+            user: null, 
+            profile: null, 
+            session: null, 
+            isLoading: false 
+          });
+        } catch (error) {
+          console.error('Logout error:', error);
+          set({ isLoading: false });
+        }
       },
-      logout: () => {
-        set({ user: null });
+
+      fetchProfile: async () => {
+        const { user } = get();
+        if (!user) return;
+
+        try {
+          const { data, error } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', user.id)
+            .single();
+
+          if (error) {
+            console.error('Error fetching profile:', error.message);
+            return;
+          }
+
+          if (data) {
+            const profile: UserProfile = {
+              id: data.id,
+              email: data.email,
+              name: data.name,
+              role: data.role,
+              avatar_url: data.avatar_url,
+              company_name: data.company_name,
+              position: data.position,
+              bio: data.bio,
+              skills: data.skills,
+              locations: data.locations,
+              verified: data.verified,
+            };
+            set({ profile });
+          }
+        } catch (error) {
+          console.error('Error fetching profile:', error);
+        }
+      },
+
+      updateProfile: async (profileData: Partial<UserProfile>) => {
+        const { user, profile } = get();
+        if (!user || !profile) return { error: 'No user logged in' };
+
+        try {
+          const { error } = await supabase
+            .from('profiles')
+            .update(profileData)
+            .eq('id', user.id);
+
+          if (error) {
+            return { error: error.message };
+          }
+
+          set({ profile: { ...profile, ...profileData } });
+          return {};
+        } catch (error) {
+          return { error: 'An unexpected error occurred' };
+        }
       },
     }),
     {
       name: 'auth-storage',
+      partialize: (state) => ({ 
+        session: state.session,
+        user: state.user,
+        profile: state.profile 
+      }),
     }
   )
 );
