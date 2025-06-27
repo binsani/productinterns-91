@@ -10,21 +10,23 @@ import { useToast } from "@/hooks/use-toast";
 import ProfileEditModal from "./ProfileEditModal";
 
 const ProfileSection = () => {
-  const { user, updateUser } = useAuthStore();
+  const { profile, updateProfile } = useAuthStore();
   const { toast } = useToast();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [profileData, setProfileData] = useState({
-    skills: ["Product Strategy", "User Research", "Data Analysis", "Agile", "Figma"],
-    locations: ["San Francisco", "New York", "Remote"]
+    skills: profile?.skills || ["Product Strategy", "User Research", "Data Analysis", "Agile", "Figma"],
+    locations: profile?.locations || ["San Francisco", "New York", "Remote"]
   });
   const [uploadedResume, setUploadedResume] = useState<File | null>(null);
-  const [profileImageUrl, setProfileImageUrl] = useState(user?.avatar);
+  const [profileImageUrl, setProfileImageUrl] = useState(profile?.avatar_url);
   
   const photoInputRef = useRef<HTMLInputElement>(null);
   const resumeInputRef = useRef<HTMLInputElement>(null);
 
   const handleProfileSave = (data: { skills: string[]; locations: string[] }) => {
     setProfileData(data);
+    // Update the profile in the database
+    updateProfile(data);
   };
 
   const handlePhotoChange = () => {
@@ -38,10 +40,8 @@ const ProfileSection = () => {
         const imageUrl = URL.createObjectURL(file);
         setProfileImageUrl(imageUrl);
         
-        // Update user avatar in store
-        if (updateUser) {
-          updateUser({ ...user!, avatar: imageUrl });
-        }
+        // Update profile avatar in store
+        updateProfile({ avatar_url: imageUrl });
         
         toast({
           title: "Photo Updated",
@@ -113,15 +113,15 @@ const ProfileSection = () => {
             <div className="flex items-center space-x-4">
               <div className="relative">
                 <Avatar className="h-20 w-20">
-                  <AvatarImage src={profileImageUrl} alt={user?.name} />
+                  <AvatarImage src={profileImageUrl} alt={profile?.name} />
                   <AvatarFallback>
                     <User className="h-8 w-8" />
                   </AvatarFallback>
                 </Avatar>
               </div>
               <div>
-                <h3 className="text-xl font-semibold">{user?.name}</h3>
-                <p className="text-gray-600">{user?.email}</p>
+                <h3 className="text-xl font-semibold">{profile?.name || "User"}</h3>
+                <p className="text-gray-600">{profile?.email}</p>
                 <Button variant="outline" size="sm" className="mt-2" onClick={handlePhotoChange}>
                   <Upload className="h-4 w-4 mr-2" />
                   Change Photo

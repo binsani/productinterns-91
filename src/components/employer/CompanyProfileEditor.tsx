@@ -13,10 +13,10 @@ import { useAuthStore } from "@/stores/authStore";
 
 const CompanyProfileEditor = () => {
   const { toast } = useToast();
-  const { user, updateUser } = useAuthStore();
+  const { profile, updateProfile } = useAuthStore();
   const [isEditing, setIsEditing] = useState(false);
   const [companyData, setCompanyData] = useState({
-    name: user?.companyName || "",
+    name: profile?.company_name || "",
     industry: "Technology & Software",
     size: "500-1000",
     location: "San Francisco, CA",
@@ -42,10 +42,8 @@ const CompanyProfileEditor = () => {
   };
 
   const handleSave = () => {
-    // Update the user's company name in the auth store
-    if (user) {
-      updateUser({ ...user, companyName: companyData.name });
-    }
+    // Update the profile's company name in the auth store
+    updateProfile({ company_name: companyData.name });
     
     setIsEditing(false);
     toast({

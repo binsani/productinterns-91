@@ -32,7 +32,7 @@ import Subscriptions from "@/components/admin/Subscriptions";
 import SecuritySettings from "@/components/admin/SecuritySettings";
 
 const AdminDashboard = () => {
-  const { user } = useAuthStore();
+  const { profile } = useAuthStore();
   const [activeTab, setActiveTab] = useState("overview");
 
   const navigationItems = [
@@ -52,8 +52,8 @@ const AdminDashboard = () => {
       <div className="bg-gradient-to-r from-purple-600 to-blue-600 rounded-lg p-6 text-white">
         <div className="flex items-center space-x-4">
           <Avatar className="h-16 w-16 border-4 border-white/20">
-            <AvatarImage src={user?.avatar} alt={user?.name} />
-            <AvatarFallback>{user?.name?.charAt(0)}</AvatarFallback>
+            <AvatarImage src={profile?.avatar_url} alt={profile?.name} />
+            <AvatarFallback>{profile?.name?.charAt(0) || "A"}</AvatarFallback>
           </Avatar>
           <div>
             <h2 className="text-2xl font-bold">Admin Dashboard</h2>

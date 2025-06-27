@@ -38,7 +38,7 @@ import ApplicationCard from "@/components/shared/ApplicationCard";
 import ScheduleInterviewModal from "@/components/employer/ScheduleInterviewModal";
 
 const EmployerDashboard = () => {
-  const { user } = useAuthStore();
+  const { profile } = useAuthStore();
   const [activeTab, setActiveTab] = useState("overview");
   const [isInternshipPostingModalOpen, setIsInternshipPostingModalOpen] = useState(false);
   const [isScheduleInterviewModalOpen, setIsScheduleInterviewModalOpen] = useState(false);
@@ -77,10 +77,10 @@ const EmployerDashboard = () => {
     <div className="space-y-6">
       {/* Welcome Section */}
       <WelcomeHero
-        name={user?.name || "User"}
-        avatar={user?.avatar}
-        title={`Welcome, ${user?.name}!`}
-        subtitle={`Find the perfect product management interns for ${user?.companyName}`}
+        name={profile?.name || "User"}
+        avatar={profile?.avatar_url}
+        title={`Welcome, ${profile?.name || "User"}!`}
+        subtitle={`Find the perfect product management interns for ${profile?.company_name || "your company"}`}
         gradient="from-green-600 to-blue-600"
       />
 

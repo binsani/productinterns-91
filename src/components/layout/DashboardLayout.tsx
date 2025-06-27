@@ -36,7 +36,7 @@ const DashboardLayout = ({
   onTabChange, 
   children 
 }: DashboardLayoutProps) => {
-  const { user, logout } = useAuthStore();
+  const { profile, logout } = useAuthStore();
 
   const handleProfileSettings = () => {
     console.log("Opening profile settings...");
@@ -68,7 +68,7 @@ const DashboardLayout = ({
             </div>
             <div>
               <h1 className="text-xl font-semibold text-gray-900">{title}</h1>
-              <p className="text-sm text-gray-600">Welcome back, {user?.name}</p>
+              <p className="text-sm text-gray-600">Welcome back, {profile?.name || "User"}</p>
             </div>
           </div>
           
@@ -81,17 +81,17 @@ const DashboardLayout = ({
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="relative h-10 w-10 rounded-full">
                   <Avatar className="h-10 w-10">
-                    <AvatarImage src={user?.avatar} alt={user?.name} />
-                    <AvatarFallback>{user?.name?.charAt(0)}</AvatarFallback>
+                    <AvatarImage src={profile?.avatar_url} alt={profile?.name} />
+                    <AvatarFallback>{profile?.name?.charAt(0) || "U"}</AvatarFallback>
                   </Avatar>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-56 bg-white" align="end" forceMount>
                 <div className="flex flex-col space-y-1 p-2">
-                  <p className="text-sm font-medium leading-none">{user?.name}</p>
-                  <p className="text-xs leading-none text-muted-foreground">{user?.email}</p>
-                  <Badge className={cn("w-fit mt-1", getRoleColor(user?.role || ""))} variant="secondary">
-                    {user?.role}
+                  <p className="text-sm font-medium leading-none">{profile?.name || "User"}</p>
+                  <p className="text-xs leading-none text-muted-foreground">{profile?.email}</p>
+                  <Badge className={cn("w-fit mt-1", getRoleColor(profile?.role || ""))} variant="secondary">
+                    {profile?.role || "user"}
                   </Badge>
                 </div>
                 <DropdownMenuSeparator />

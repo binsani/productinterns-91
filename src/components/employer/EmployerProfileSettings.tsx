@@ -21,13 +21,13 @@ import { useAuthStore } from "@/stores/authStore";
 
 const EmployerProfileSettings = () => {
   const { toast } = useToast();
-  const { user, updateUser } = useAuthStore();
-  const [profile, setProfile] = useState({
-    name: user?.name || "",
-    email: user?.email || "",
+  const { profile, updateProfile } = useAuthStore();
+  const [profileState, setProfileState] = useState({
+    name: profile?.name || "",
+    email: profile?.email || "",
     phone: "+1 (555) 123-4567",
     location: "San Francisco, CA",
-    avatar: user?.avatar || "",
+    avatar: profile?.avatar_url || "",
     companyRole: "HR Manager"
   });
 
@@ -48,9 +48,11 @@ const EmployerProfileSettings = () => {
   });
 
   const handleProfileSave = () => {
-    if (user) {
-      updateUser({ ...user, name: profile.name, email: profile.email, avatar: profile.avatar });
-    }
+    updateProfile({ 
+      name: profileState.name, 
+      email: profileState.email, 
+      avatar_url: profileState.avatar 
+    });
     
     toast({
       title: "Profile Updated",
@@ -61,8 +63,8 @@ const EmployerProfileSettings = () => {
   const handleAvatarUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      const mockUrl = `https://api.dicebear.com/7.x/avataaars/svg?seed=${profile.name}`;
-      setProfile(prev => ({ ...prev, avatar: mockUrl }));
+      const mockUrl = `https://api.dicebear.com/7.x/avataaars/svg?seed=${profileState.name}`;
+      setProfileState(prev => ({ ...prev, avatar: mockUrl }));
       toast({
         title: "Avatar Updated",
         description: "Your profile picture has been updated.",
@@ -100,13 +102,13 @@ const EmployerProfileSettings = () => {
         <CardContent className="space-y-6">
           <div className="flex items-center space-x-4">
             <Avatar className="h-20 w-20">
-              <AvatarImage src={profile.avatar} />
-              <AvatarFallback>{profile.name.charAt(0)}</AvatarFallback>
+              <AvatarImage src={profileState.avatar} />
+              <AvatarFallback>{profileState.name.charAt(0)}</AvatarFallback>
             </Avatar>
             <div>
-              <h3 className="font-semibold">{profile.name}</h3>
-              <p className="text-sm text-gray-600">{profile.email}</p>
-              <p className="text-sm text-gray-500">{profile.companyRole}</p>
+              <h3 className="font-semibold">{profileState.name}</h3>
+              <p className="text-sm text-gray-600">{profileState.email}</p>
+              <p className="text-sm text-gray-500">{profileState.companyRole}</p>
               <div className="mt-2">
                 <input
                   type="file"
@@ -130,8 +132,8 @@ const EmployerProfileSettings = () => {
               <Label htmlFor="name">Full Name</Label>
               <Input
                 id="name"
-                value={profile.name}
-                onChange={(e) => setProfile(prev => ({ ...prev, name: e.target.value }))}
+                value={profileState.name}
+                onChange={(e) => setProfileState(prev => ({ ...prev, name: e.target.value }))}
               />
             </div>
 
@@ -140,8 +142,8 @@ const EmployerProfileSettings = () => {
               <Input
                 id="email"
                 type="email"
-                value={profile.email}
-                onChange={(e) => setProfile(prev => ({ ...prev, email: e.target.value }))}
+                value={profileState.email}
+                onChange={(e) => setProfileState(prev => ({ ...prev, email: e.target.value }))}
               />
             </div>
 
@@ -149,8 +151,8 @@ const EmployerProfileSettings = () => {
               <Label htmlFor="phone">Phone</Label>
               <Input
                 id="phone"
-                value={profile.phone}
-                onChange={(e) => setProfile(prev => ({ ...prev, phone: e.target.value }))}
+                value={profileState.phone}
+                onChange={(e) => setProfileState(prev => ({ ...prev, phone: e.target.value }))}
               />
             </div>
 
@@ -158,8 +160,8 @@ const EmployerProfileSettings = () => {
               <Label htmlFor="companyRole">Role in Company</Label>
               <Input
                 id="companyRole"
-                value={profile.companyRole}
-                onChange={(e) => setProfile(prev => ({ ...prev, companyRole: e.target.value }))}
+                value={profileState.companyRole}
+                onChange={(e) => setProfileState(prev => ({ ...prev, companyRole: e.target.value }))}
               />
             </div>
 
@@ -167,8 +169,8 @@ const EmployerProfileSettings = () => {
               <Label htmlFor="location">Location</Label>
               <Input
                 id="location"
-                value={profile.location}
-                onChange={(e) => setProfile(prev => ({ ...prev, location: e.target.value }))}
+                value={profileState.location}
+                onChange={(e) => setProfileState(prev => ({ ...prev, location: e.target.value }))}
               />
             </div>
           </div>
