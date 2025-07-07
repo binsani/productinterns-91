@@ -161,7 +161,7 @@ export const useAuthStore = create<AuthState>()(
             .from('profiles')
             .select('*')
             .eq('id', user.id)
-            .single();
+            .maybeSingle();
 
           if (error) {
             console.error('Error fetching profile:', error.message);
@@ -183,6 +183,44 @@ export const useAuthStore = create<AuthState>()(
               verified: data.verified,
             };
             set({ profile });
+          } else {
+            // If no profile exists, create one using user metadata
+            const metadata = user.user_metadata || {};
+            const newProfileData = {
+              id: user.id,
+              email: user.email || '',
+              name: metadata.name || user.email || 'User',
+              role: metadata.role || 'intern',
+              company_name: metadata.company_name,
+            };
+
+            const { data: newProfile, error: insertError } = await supabase
+              .from('profiles')
+              .insert(newProfileData)
+              .select()
+              .single();
+
+            if (insertError) {
+              console.error('Error creating profile:', insertError.message);
+              return;
+            }
+
+            if (newProfile) {
+              const profile: UserProfile = {
+                id: newProfile.id,
+                email: newProfile.email,
+                name: newProfile.name,
+                role: newProfile.role,
+                avatar_url: newProfile.avatar_url,
+                company_name: newProfile.company_name,
+                position: newProfile.position,
+                bio: newProfile.bio,
+                skills: newProfile.skills,
+                locations: newProfile.locations,
+                verified: newProfile.verified,
+              };
+              set({ profile });
+            }
           }
         } catch (error) {
           console.error('Error fetching profile:', error);
