@@ -160,6 +160,42 @@ const Subscriptions = () => {
     });
   };
 
+  const handleExportData = () => {
+    const csvContent = "data:text/csv;charset=utf-8,ID,Company,Plan,Status,Amount,Billing Cycle,Start Date,End Date,Usage\n";
+    let csvData = csvContent;
+    
+    subscriptions.forEach(sub => {
+      csvData += `${sub.id},${sub.companyName},${sub.plan},${sub.status},${sub.amount},${sub.billingCycle},${sub.startDate},${sub.endDate},${sub.internshipCount}/${sub.maxInternships}\n`;
+    });
+
+    const encodedUri = encodeURI(csvData);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "subscriptions-export.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    toast({
+      title: "Export Complete",
+      description: "Subscription data has been exported successfully.",
+    });
+  };
+
+  const handleViewBillingHistory = () => {
+    toast({
+      title: "Billing History",
+      description: "Redirecting to billing history page...",
+    });
+  };
+
+  const handleUpdatePaymentMethod = () => {
+    toast({
+      title: "Payment Method",
+      description: "Redirecting to payment method update page...",
+    });
+  };
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'active': return 'bg-green-100 text-green-800';
@@ -193,7 +229,7 @@ const Subscriptions = () => {
           <p className="text-gray-600">Monitor and manage billing and subscriptions</p>
         </div>
         <div className="flex space-x-2">
-          <Button variant="outline">
+          <Button variant="outline" onClick={handleExportData}>
             <Download className="h-4 w-4 mr-2" />
             Export Data
           </Button>
@@ -505,12 +541,12 @@ const Subscriptions = () => {
                     </Button>
                   )}
                   
-                  <Button variant="outline" className="w-full">
+                  <Button variant="outline" className="w-full" onClick={handleViewBillingHistory}>
                     <Eye className="h-4 w-4 mr-2" />
                     View Billing History
                   </Button>
                   
-                  <Button variant="outline" className="w-full">
+                  <Button variant="outline" className="w-full" onClick={handleUpdatePaymentMethod}>
                     <CreditCard className="h-4 w-4 mr-2" />
                     Update Payment Method
                   </Button>

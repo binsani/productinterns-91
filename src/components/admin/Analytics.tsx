@@ -49,8 +49,41 @@ const Analytics = () => {
   ];
 
   const generateReport = () => {
-    // Mock report generation
     console.log(`Generating ${metric} report for ${timeRange}`);
+    
+    // Create sample CSV data based on selected metric
+    let csvContent = "";
+    let fileName = "";
+    
+    if (metric === "users") {
+      csvContent = "data:text/csv;charset=utf-8,Month,Interns,Employers\n";
+      userGrowthData.forEach(row => {
+        csvContent += `${row.month},${row.interns},${row.employers}\n`;
+      });
+      fileName = `users-report-${timeRange}.csv`;
+    } else if (metric === "applications") {
+      csvContent = "data:text/csv;charset=utf-8,Day,Applications\n";
+      applicationData.forEach(row => {
+        csvContent += `${row.day},${row.applications}\n`;
+      });
+      fileName = `applications-report-${timeRange}.csv`;
+    } else {
+      csvContent = "data:text/csv;charset=utf-8,Metric,Value\n";
+      csvContent += "Total Users,2847\n";
+      csvContent += "Active Employers,156\n";
+      csvContent += "Applications,1234\n";
+      csvContent += "Success Rate,73%\n";
+      fileName = `${metric}-report-${timeRange}.csv`;
+    }
+
+    // Create and trigger download
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", fileName);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   return (

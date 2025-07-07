@@ -60,6 +60,7 @@ interface User {
 interface NewUser {
   name: string;
   email: string;
+  password: string;
   role: "intern" | "employer" | "admin";
   companyName: string;
 }
@@ -72,6 +73,7 @@ const UserManagement = () => {
   const [newUser, setNewUser] = useState<NewUser>({
     name: "",
     email: "",
+    password: "",
     role: "intern",
     companyName: ""
   });
@@ -136,8 +138,8 @@ const UserManagement = () => {
   ]);
 
   const handleAddUser = async () => {
-    if (!newUser.name.trim() || !newUser.email.trim()) {
-      alert("Please fill in name and email");
+    if (!newUser.name.trim() || !newUser.email.trim() || !newUser.password.trim()) {
+      alert("Please fill in all required fields");
       return;
     }
 
@@ -166,7 +168,7 @@ const UserManagement = () => {
       };
 
       setUsers(prev => [...prev, user]);
-      setNewUser({ name: "", email: "", role: "intern", companyName: "" });
+      setNewUser({ name: "", email: "", password: "", role: "intern", companyName: "" });
       console.log("New user added:", user);
       alert("User added successfully!");
     } catch (error) {
@@ -386,6 +388,15 @@ const UserManagement = () => {
                       placeholder="Enter email address"
                       value={newUser.email}
                       onChange={(e) => setNewUser(prev => ({ ...prev, email: e.target.value }))}
+                    />
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium">Password</label>
+                    <Input
+                      type="password"
+                      placeholder="Enter password"
+                      value={newUser.password}
+                      onChange={(e) => setNewUser(prev => ({ ...prev, password: e.target.value }))}
                     />
                   </div>
                   <div>

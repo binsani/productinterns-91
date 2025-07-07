@@ -30,6 +30,7 @@ import Support from "@/components/admin/Support";
 import PlatformSettings from "@/components/admin/PlatformSettings";
 import Subscriptions from "@/components/admin/Subscriptions";
 import SecuritySettings from "@/components/admin/SecuritySettings";
+import AdminProfileSettings from "@/components/admin/AdminProfileSettings";
 
 const AdminDashboard = () => {
   const { profile } = useAuthStore();
@@ -43,6 +44,7 @@ const AdminDashboard = () => {
     { id: "billing", label: "Subscriptions", icon: DollarSign },
     { id: "support", label: "Support", icon: MessageSquare },
     { id: "security", label: "Security", icon: Lock },
+    { id: "profile", label: "Profile Settings", icon: Users },
     { id: "settings", label: "Platform Settings", icon: Settings },
   ];
 
@@ -242,6 +244,8 @@ const AdminDashboard = () => {
         return <Support />;
       case "security":
         return <SecuritySettings />;
+      case "profile":
+        return <AdminProfileSettings />;
       case "settings":
         return <PlatformSettings />;
       default:
