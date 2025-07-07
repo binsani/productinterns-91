@@ -1,5 +1,5 @@
 
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Award, Download, Share2 } from "lucide-react";
 
@@ -19,6 +19,12 @@ const CertificateModal = ({ assessment, isOpen, onClose }: CertificateModalProps
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-4xl">
+        <DialogHeader className="sr-only">
+          <DialogTitle>Certificate of Achievement</DialogTitle>
+          <DialogDescription>
+            Your certificate for completing {assessment.title} with a score of {assessment.score}%
+          </DialogDescription>
+        </DialogHeader>
         <div className="space-y-6">
           {/* Certificate */}
           <div className="bg-gradient-to-br from-blue-50 to-purple-50 border-2 border-purple-200 rounded-lg p-8 text-center">

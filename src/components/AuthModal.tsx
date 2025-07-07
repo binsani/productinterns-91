@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -101,6 +101,12 @@ const AuthModal = ({ isOpen, onClose, mode, onModeChange }: AuthModalProps) => {
           <DialogTitle className="text-center text-2xl font-bold">
             {mode === "signin" ? "Welcome Back" : "Join Product Interns"}
           </DialogTitle>
+          <DialogDescription className="text-center">
+            {mode === "signin" 
+              ? "Sign in to access your account and manage your internship applications" 
+              : "Create your account to start your internship journey"
+            }
+          </DialogDescription>
         </DialogHeader>
         
         <Tabs value={mode} onValueChange={(value) => onModeChange(value as "signin" | "signup")} className="w-full">
