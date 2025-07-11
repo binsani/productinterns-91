@@ -1,6 +1,6 @@
 
 import { ReactNode } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, DefaultValues } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Form } from '@/components/ui/form';
@@ -8,7 +8,7 @@ import { Form } from '@/components/ui/form';
 interface ValidatedFormProps<T extends z.ZodSchema> {
   schema: T;
   onSubmit: (data: z.infer<T>) => void | Promise<void>;
-  defaultValues?: Partial<z.infer<T>>;
+  defaultValues?: DefaultValues<z.infer<T>>;
   children: (form: ReturnType<typeof useForm<z.infer<T>>>) => ReactNode;
   className?: string;
 }
