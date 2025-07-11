@@ -2,14 +2,18 @@
 import { lazy, Suspense } from 'react';
 import { Loader2 } from 'lucide-react';
 
-// Lazy load heavy components
+// Lazy load heavy components with proper default export handling
 export const LazyInternDashboard = lazy(() => import('@/components/dashboards/InternDashboard'));
 export const LazyEmployerDashboard = lazy(() => import('@/components/dashboards/EmployerDashboard'));
 export const LazyAdminDashboard = lazy(() => import('@/components/dashboards/AdminDashboard'));
-export const LazyApplicationReview = lazy(() => import('@/components/employer/ApplicationReview'));
+export const LazyApplicationReview = lazy(() => 
+  import('@/components/employer/ApplicationReview').then(module => ({ default: module.ApplicationReview }))
+);
 export const LazyInternshipBrowser = lazy(() => import('@/components/intern/InternshipBrowser'));
 export const LazyResumeBuilder = lazy(() => import('@/components/intern/ResumeBuilder'));
-export const LazyMessagingSystem = lazy(() => import('@/components/shared/MessagingSystem'));
+export const LazyMessagingSystem = lazy(() => 
+  import('@/components/shared/MessagingSystem').then(module => ({ default: module.MessagingSystem }))
+);
 
 // Loading fallback component
 export const LoadingFallback = () => (
