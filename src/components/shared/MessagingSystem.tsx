@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Send, MessageCircle } from "lucide-react";
 import { useAuthStore } from "@/stores/authStore";
-import { useMessages, useSendMessage } from "@/hooks/useSupabaseQuery";
+import { useMessages, useSendMessage } from "@/hooks/useMessages";
 import { useRealtimeMessages } from "@/hooks/useRealtimeMessages";
 import { ValidatedForm } from "@/components/forms/ValidatedForm";
 import { messageSchema } from "@/schemas/validationSchemas";
