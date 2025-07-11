@@ -2,6 +2,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { supabase } from '@/integrations/supabase/client';
+import { handleError } from '@/utils/errorHandler';
 import type { User, Session } from '@supabase/supabase-js';
 
 export type UserRole = 'intern' | 'employer' | 'admin';
@@ -25,12 +26,14 @@ interface AuthState {
   profile: UserProfile | null;
   session: Session | null;
   isLoading: boolean;
+  error: string | null;
   login: (email: string, password: string) => Promise<{ error?: string }>;
   signup: (email: string, password: string, name: string, role: UserRole, companyName?: string) => Promise<{ error?: string }>;
   logout: () => Promise<void>;
   updateProfile: (profileData: Partial<UserProfile>) => Promise<{ error?: string }>;
   fetchProfile: () => Promise<void>;
   initialize: () => void;
+  clearError: () => void;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -40,16 +43,19 @@ export const useAuthStore = create<AuthState>()(
       profile: null,
       session: null,
       isLoading: false,
+      error: null,
+
+      clearError: () => set({ error: null }),
 
       initialize: () => {
         // Set up auth state listener
         const { data: { subscription } } = supabase.auth.onAuthStateChange(
           async (event, session) => {
-            console.log('Auth state changed:', event, session?.user?.email);
             set({ 
               session, 
               user: session?.user ?? null,
-              isLoading: false 
+              isLoading: false,
+              error: null
             });
             
             // Fetch profile when user logs in
@@ -65,7 +71,6 @@ export const useAuthStore = create<AuthState>()(
 
         // Check for existing session
         supabase.auth.getSession().then(({ data: { session } }) => {
-          console.log('Initial session check:', session?.user?.email);
           set({ 
             session, 
             user: session?.user ?? null,
@@ -81,7 +86,7 @@ export const useAuthStore = create<AuthState>()(
       },
 
       login: async (email: string, password: string) => {
-        set({ isLoading: true });
+        set({ isLoading: true, error: null });
         try {
           const { data, error } = await supabase.auth.signInWithPassword({
             email,
@@ -89,20 +94,20 @@ export const useAuthStore = create<AuthState>()(
           });
 
           if (error) {
-            set({ isLoading: false });
+            set({ isLoading: false, error: error.message });
             return { error: error.message };
           }
 
-          console.log('Login successful:', data.user?.email);
           return {};
-        } catch (error) {
-          set({ isLoading: false });
-          return { error: 'An unexpected error occurred' };
+        } catch (error: any) {
+          const errorMessage = 'An unexpected error occurred';
+          set({ isLoading: false, error: errorMessage });
+          return { error: errorMessage };
         }
       },
 
       signup: async (email: string, password: string, name: string, role: UserRole, companyName?: string) => {
-        set({ isLoading: true });
+        set({ isLoading: true, error: null });
         try {
           const redirectUrl = `${window.location.origin}/`;
           
@@ -120,16 +125,16 @@ export const useAuthStore = create<AuthState>()(
           });
 
           if (error) {
-            set({ isLoading: false });
+            set({ isLoading: false, error: error.message });
             return { error: error.message };
           }
 
-          console.log('Signup successful:', data.user?.email);
           set({ isLoading: false });
           return {};
-        } catch (error) {
-          set({ isLoading: false });
-          return { error: 'An unexpected error occurred' };
+        } catch (error: any) {
+          const errorMessage = 'An unexpected error occurred';
+          set({ isLoading: false, error: errorMessage });
+          return { error: errorMessage };
         }
       },
 
@@ -138,16 +143,17 @@ export const useAuthStore = create<AuthState>()(
         try {
           const { error } = await supabase.auth.signOut();
           if (error) {
-            console.error('Logout error:', error.message);
+            handleError(error);
           }
           set({ 
             user: null, 
             profile: null, 
             session: null, 
-            isLoading: false 
+            isLoading: false,
+            error: null
           });
-        } catch (error) {
-          console.error('Logout error:', error);
+        } catch (error: any) {
+          handleError(error);
           set({ isLoading: false });
         }
       },
@@ -164,7 +170,7 @@ export const useAuthStore = create<AuthState>()(
             .maybeSingle();
 
           if (error) {
-            console.error('Error fetching profile:', error.message);
+            handleError(error);
             return;
           }
 
@@ -201,7 +207,7 @@ export const useAuthStore = create<AuthState>()(
               .single();
 
             if (insertError) {
-              console.error('Error creating profile:', insertError.message);
+              handleError(insertError);
               return;
             }
 
@@ -222,8 +228,8 @@ export const useAuthStore = create<AuthState>()(
               set({ profile });
             }
           }
-        } catch (error) {
-          console.error('Error fetching profile:', error);
+        } catch (error: any) {
+          handleError(error);
         }
       },
 
@@ -243,7 +249,7 @@ export const useAuthStore = create<AuthState>()(
 
           set({ profile: { ...profile, ...profileData } });
           return {};
-        } catch (error) {
+        } catch (error: any) {
           return { error: 'An unexpected error occurred' };
         }
       },

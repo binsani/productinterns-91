@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,6 +8,7 @@ import { Upload, File, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuthStore } from "@/stores/authStore";
 import { supabase } from "@/integrations/supabase/client";
+import { handleError } from "@/utils/errorHandler";
 
 interface FileUploadProps {
   bucket: 'resumes' | 'avatars' | 'company-logos';
@@ -59,6 +61,11 @@ export const FileUpload = ({
       const fileExt = selectedFile.name.split('.').pop();
       const fileName = `${profile.id}/${Date.now()}.${fileExt}`;
 
+      // Simulate progress updates
+      const progressInterval = setInterval(() => {
+        setUploadProgress(prev => Math.min(prev + 10, 90));
+      }, 100);
+
       // Upload file to Supabase Storage
       const { data, error } = await supabase.storage
         .from(bucket)
@@ -67,12 +74,9 @@ export const FileUpload = ({
           upsert: true
         });
 
-      if (error) throw error;
+      clearInterval(progressInterval);
 
-      // Get public URL
-      const { data: { publicUrl } } = supabase.storage
-        .from(bucket)
-        .getPublicUrl(data.path);
+      if (error) throw error;
 
       setUploadProgress(100);
       
@@ -84,12 +88,7 @@ export const FileUpload = ({
       onUploadComplete?.(data.path);
       setSelectedFile(null);
     } catch (error) {
-      console.error('Upload error:', error);
-      toast({
-        title: "Upload failed",
-        description: "Failed to upload file. Please try again.",
-        variant: "destructive"
-      });
+      handleError(error, toast);
     } finally {
       setUploading(false);
       setUploadProgress(0);
@@ -117,12 +116,7 @@ export const FileUpload = ({
 
       onUploadComplete?.("");
     } catch (error) {
-      console.error('Delete error:', error);
-      toast({
-        title: "Delete failed",
-        description: "Failed to delete file",
-        variant: "destructive"
-      });
+      handleError(error, toast);
     }
   };
 

@@ -7,8 +7,9 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { Send, Search, Bell, BellOff, Mail, Phone } from "lucide-react";
-import { toast } from "@/components/ui/use-toast";
+import { Send, Search, Bell, Mail, Phone } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { ErrorBoundary } from "@/components/shared/ErrorBoundary";
 
 interface Message {
   id: number;
@@ -41,6 +42,7 @@ const Messages = () => {
   const [emailNotifications, setEmailNotifications] = useState(true);
   const [pushNotifications, setPushNotifications] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const { toast } = useToast();
 
   const [conversations, setConversations] = useState<Conversation[]>([
     {
@@ -131,7 +133,7 @@ const Messages = () => {
         });
       }
     }
-  }, [pushNotifications]);
+  }, [pushNotifications, toast]);
 
   // Simulate receiving new messages
   useEffect(() => {
@@ -175,19 +177,18 @@ const Messages = () => {
   }, [selectedConversation, conversations, messages.length, pushNotifications, emailNotifications]);
 
   const getRandomMessage = () => {
-    const messages = [
+    const messageOptions = [
       "Can you share more details about your PM experience?",
       "What's your availability for next week?",
       "We're impressed with your application!",
       "Would you be interested in a quick call?",
       "Thanks for your quick response!"
     ];
-    return messages[Math.floor(Math.random() * messages.length)];
+    return messageOptions[Math.floor(Math.random() * messageOptions.length)];
   };
 
   const sendEmailNotification = (message: Message) => {
     // Simulate email notification
-    console.log(`Email notification sent: New message from ${message.sender}`);
     toast({
       title: "Email Sent",
       description: `Notification email sent about new message from ${message.sender}`
@@ -249,193 +250,195 @@ const Messages = () => {
   const selectedConv = conversations.find(c => c.id === selectedConversation);
 
   return (
-    <div className="space-y-6">
-      {/* Notification Settings */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center">
-            <Bell className="h-5 w-5 mr-2" />
-            Notification Settings
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div className="space-y-0.5">
-              <Label>Email Notifications</Label>
-              <p className="text-sm text-gray-600">Receive email alerts for new messages</p>
-            </div>
-            <Switch
-              checked={emailNotifications}
-              onCheckedChange={setEmailNotifications}
-            />
-          </div>
-          <div className="flex items-center justify-between">
-            <div className="space-y-0.5">
-              <Label>Push Notifications</Label>
-              <p className="text-sm text-gray-600">Receive browser notifications for new messages</p>
-            </div>
-            <Switch
-              checked={pushNotifications}
-              onCheckedChange={setPushNotifications}
-            />
-          </div>
-        </CardContent>
-      </Card>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-[600px]">
-        {/* Conversations List */}
-        <Card className="lg:col-span-1">
+    <ErrorBoundary>
+      <div className="space-y-6">
+        {/* Notification Settings */}
+        <Card>
           <CardHeader>
-            <CardTitle>Messages</CardTitle>
-            <div className="relative">
-              <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-              <Input 
-                placeholder="Search conversations..." 
-                className="pl-10"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+            <CardTitle className="flex items-center">
+              <Bell className="h-5 w-5 mr-2" />
+              Notification Settings
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="space-y-0.5">
+                <Label>Email Notifications</Label>
+                <p className="text-sm text-gray-600">Receive email alerts for new messages</p>
+              </div>
+              <Switch
+                checked={emailNotifications}
+                onCheckedChange={setEmailNotifications}
               />
             </div>
-          </CardHeader>
-          <CardContent className="p-0">
-            <div className="space-y-1 max-h-96 overflow-y-auto">
-              {filteredConversations.map((conversation) => (
-                <div
-                  key={conversation.id}
-                  className={`p-4 cursor-pointer border-b hover:bg-gray-50 ${
-                    selectedConversation === conversation.id ? "bg-blue-50" : ""
-                  }`}
-                  onClick={() => {
-                    setSelectedConversation(conversation.id);
-                    markAsRead();
-                  }}
-                >
-                  <div className="flex items-center space-x-3">
-                    <div className="relative">
-                      <Avatar>
-                        <AvatarImage src={conversation.avatar} />
-                        <AvatarFallback>{conversation.name.charAt(0)}</AvatarFallback>
-                      </Avatar>
-                      {conversation.online && (
-                        <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>
-                      )}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between mb-1">
-                        <p className="font-medium truncate">{conversation.name}</p>
-                        {conversation.unread > 0 && (
-                          <Badge className="bg-blue-600 text-white text-xs">
-                            {conversation.unread}
-                          </Badge>
-                        )}
-                      </div>
-                      <p className="text-sm text-gray-600">{conversation.company} • {conversation.role}</p>
-                      <p className="text-sm text-gray-500 truncate">{conversation.lastMessage}</p>
-                      <p className="text-xs text-gray-400 mt-1">{conversation.time}</p>
-                    </div>
-                  </div>
-                </div>
-              ))}
+            <div className="flex items-center justify-between">
+              <div className="space-y-0.5">
+                <Label>Push Notifications</Label>
+                <p className="text-sm text-gray-600">Receive browser notifications for new messages</p>
+              </div>
+              <Switch
+                checked={pushNotifications}
+                onCheckedChange={setPushNotifications}
+              />
             </div>
           </CardContent>
         </Card>
 
-        {/* Chat Area */}
-        <Card className="lg:col-span-2">
-          <CardHeader className="border-b">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-3">
-                <div className="relative">
-                  <Avatar>
-                    <AvatarImage src={selectedConv?.avatar} />
-                    <AvatarFallback>
-                      {selectedConv?.name.charAt(0)}
-                    </AvatarFallback>
-                  </Avatar>
-                  {selectedConv?.online && (
-                    <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>
-                  )}
-                </div>
-                <div>
-                  <CardTitle className="text-lg">
-                    {selectedConv?.name}
-                  </CardTitle>
-                  <CardDescription>
-                    {selectedConv?.company} • {selectedConv?.role}
-                    {selectedConv?.online && (
-                      <span className="text-green-600 ml-2">• Online</span>
-                    )}
-                  </CardDescription>
-                </div>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-[600px]">
+          {/* Conversations List */}
+          <Card className="lg:col-span-1">
+            <CardHeader>
+              <CardTitle>Messages</CardTitle>
+              <div className="relative">
+                <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                <Input 
+                  placeholder="Search conversations..." 
+                  className="pl-10"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
               </div>
-              <div className="flex space-x-2">
-                <Button variant="outline" size="sm">
-                  <Mail className="h-4 w-4 mr-2" />
-                  Email
-                </Button>
-                {selectedConv?.phone && (
-                  <Button variant="outline" size="sm">
-                    <Phone className="h-4 w-4 mr-2" />
-                    Call
-                  </Button>
-                )}
-              </div>
-            </div>
-          </CardHeader>
-          
-          <CardContent className="flex flex-col h-[400px]">
-            {/* Messages */}
-            <div className="flex-1 overflow-y-auto space-y-4 p-4">
-              {messages.map((message) => (
-                <div
-                  key={message.id}
-                  className={`flex ${message.isOwn ? "justify-end" : "justify-start"}`}
-                >
-                  <div className="flex flex-col">
-                    <div
-                      className={`max-w-[70%] p-3 rounded-lg ${
-                        message.isOwn
-                          ? "bg-blue-600 text-white"
-                          : "bg-gray-100 text-gray-900"
-                      }`}
-                    >
-                      <p className="text-sm">{message.content}</p>
-                      <div className="flex items-center justify-between mt-1">
-                        <p className={`text-xs ${
-                          message.isOwn ? "text-blue-100" : "text-gray-500"
-                        }`}>
-                          {message.time}
-                        </p>
-                        {!message.isOwn && !message.read && (
-                          <div className="w-2 h-2 bg-blue-600 rounded-full ml-2"></div>
+            </CardHeader>
+            <CardContent className="p-0">
+              <div className="space-y-1 max-h-96 overflow-y-auto">
+                {filteredConversations.map((conversation) => (
+                  <div
+                    key={conversation.id}
+                    className={`p-4 cursor-pointer border-b hover:bg-gray-50 ${
+                      selectedConversation === conversation.id ? "bg-blue-50" : ""
+                    }`}
+                    onClick={() => {
+                      setSelectedConversation(conversation.id);
+                      markAsRead();
+                    }}
+                  >
+                    <div className="flex items-center space-x-3">
+                      <div className="relative">
+                        <Avatar>
+                          <AvatarImage src={conversation.avatar} />
+                          <AvatarFallback>{conversation.name.charAt(0)}</AvatarFallback>
+                        </Avatar>
+                        {conversation.online && (
+                          <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>
                         )}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between mb-1">
+                          <p className="font-medium truncate">{conversation.name}</p>
+                          {conversation.unread > 0 && (
+                            <Badge className="bg-blue-600 text-white text-xs">
+                              {conversation.unread}
+                            </Badge>
+                          )}
+                        </div>
+                        <p className="text-sm text-gray-600">{conversation.company} • {conversation.role}</p>
+                        <p className="text-sm text-gray-500 truncate">{conversation.lastMessage}</p>
+                        <p className="text-xs text-gray-400 mt-1">{conversation.time}</p>
                       </div>
                     </div>
                   </div>
-                </div>
-              ))}
-              <div ref={messagesEndRef} />
-            </div>
-            
-            {/* Message Input */}
-            <div className="border-t p-4">
-              <div className="flex space-x-2">
-                <Input
-                  placeholder="Type your message..."
-                  value={newMessage}
-                  onChange={(e) => setNewMessage(e.target.value)}
-                  onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
-                  className="flex-1"
-                />
-                <Button onClick={handleSendMessage} disabled={!newMessage.trim()}>
-                  <Send className="h-4 w-4" />
-                </Button>
+                ))}
               </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+
+          {/* Chat Area */}
+          <Card className="lg:col-span-2">
+            <CardHeader className="border-b">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <div className="relative">
+                    <Avatar>
+                      <AvatarImage src={selectedConv?.avatar} />
+                      <AvatarFallback>
+                        {selectedConv?.name.charAt(0)}
+                      </AvatarFallback>
+                    </Avatar>
+                    {selectedConv?.online && (
+                      <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>
+                    )}
+                  </div>
+                  <div>
+                    <CardTitle className="text-lg">
+                      {selectedConv?.name}
+                    </CardTitle>
+                    <CardDescription>
+                      {selectedConv?.company} • {selectedConv?.role}
+                      {selectedConv?.online && (
+                        <span className="text-green-600 ml-2">• Online</span>
+                      )}
+                    </CardDescription>
+                  </div>
+                </div>
+                <div className="flex space-x-2">
+                  <Button variant="outline" size="sm">
+                    <Mail className="h-4 w-4 mr-2" />
+                    Email
+                  </Button>
+                  {selectedConv?.phone && (
+                    <Button variant="outline" size="sm">
+                      <Phone className="h-4 w-4 mr-2" />
+                      Call
+                    </Button>
+                  )}
+                </div>
+              </div>
+            </CardHeader>
+            
+            <CardContent className="flex flex-col h-[400px]">
+              {/* Messages */}
+              <div className="flex-1 overflow-y-auto space-y-4 p-4">
+                {messages.map((message) => (
+                  <div
+                    key={message.id}
+                    className={`flex ${message.isOwn ? "justify-end" : "justify-start"}`}
+                  >
+                    <div className="flex flex-col">
+                      <div
+                        className={`max-w-[70%] p-3 rounded-lg ${
+                          message.isOwn
+                            ? "bg-blue-600 text-white"
+                            : "bg-gray-100 text-gray-900"
+                        }`}
+                      >
+                        <p className="text-sm">{message.content}</p>
+                        <div className="flex items-center justify-between mt-1">
+                          <p className={`text-xs ${
+                            message.isOwn ? "text-blue-100" : "text-gray-500"
+                          }`}>
+                            {message.time}
+                          </p>
+                          {!message.isOwn && !message.read && (
+                            <div className="w-2 h-2 bg-blue-600 rounded-full ml-2"></div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+                <div ref={messagesEndRef} />
+              </div>
+              
+              {/* Message Input */}
+              <div className="border-t p-4">
+                <div className="flex space-x-2">
+                  <Input
+                    placeholder="Type your message..."
+                    value={newMessage}
+                    onChange={(e) => setNewMessage(e.target.value)}
+                    onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
+                    className="flex-1"
+                  />
+                  <Button onClick={handleSendMessage} disabled={!newMessage.trim()}>
+                    <Send className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
-    </div>
+    </ErrorBoundary>
   );
 };
 
