@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { handleError } from '@/utils/errorHandler';
 import { useToast } from '@/hooks/use-toast';
+import { logger } from '@/utils/logger';
 
 export const useInternships = (filters?: { location?: string; skills?: string[] }) => {
   const { toast } = useToast();
@@ -11,6 +12,8 @@ export const useInternships = (filters?: { location?: string; skills?: string[] 
     queryKey: ['internships', filters],
     queryFn: async () => {
       try {
+        logger.info('Fetching internships', { filters });
+        
         let query = supabase
           .from('internships')
           .select(`
@@ -35,8 +38,11 @@ export const useInternships = (filters?: { location?: string; skills?: string[] 
         const { data, error } = await query.order('created_at', { ascending: false });
 
         if (error) throw error;
+        
+        logger.info('Internships fetched successfully', { count: data?.length });
         return data || [];
       } catch (error) {
+        logger.error('Failed to fetch internships', error, { filters });
         handleError(error, toast);
         throw error;
       }
@@ -52,6 +58,8 @@ export const useApplications = (userId?: string) => {
     queryKey: ['applications', userId],
     queryFn: async () => {
       try {
+        logger.info('Fetching applications', { userId });
+        
         const { data, error } = await supabase
           .from('applications')
           .select(`
@@ -70,8 +78,11 @@ export const useApplications = (userId?: string) => {
           .order('applied_at', { ascending: false });
 
         if (error) throw error;
+        
+        logger.info('Applications fetched successfully', { count: data?.length });
         return data || [];
       } catch (error) {
+        logger.error('Failed to fetch applications', error, { userId });
         handleError(error, toast);
         throw error;
       }
@@ -91,6 +102,11 @@ export const useCreateApplication = () => {
       cover_letter: string;
       resume_url?: string;
     }) => {
+      logger.info('Creating application', { 
+        internshipId: applicationData.internship_id,
+        internId: applicationData.intern_id 
+      });
+      
       const { data, error } = await supabase
         .from('applications')
         .insert(applicationData)
@@ -100,14 +116,16 @@ export const useCreateApplication = () => {
       if (error) throw error;
       return data;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['applications'] });
+      logger.info('Application created successfully', { applicationId: data.id });
       toast({
         title: 'Application submitted',
         description: 'Your application has been submitted successfully.',
       });
     },
     onError: (error) => {
+      logger.error('Failed to create application', error);
       handleError(error, toast);
     },
   });
@@ -120,6 +138,8 @@ export const useMessages = (applicationId?: string) => {
     queryKey: ['messages', applicationId],
     queryFn: async () => {
       try {
+        logger.info('Fetching messages', { applicationId });
+        
         const { data, error } = await supabase
           .from('messages')
           .select(`
@@ -130,8 +150,11 @@ export const useMessages = (applicationId?: string) => {
           .order('created_at', { ascending: true });
 
         if (error) throw error;
+        
+        logger.info('Messages fetched successfully', { count: data?.length });
         return data || [];
       } catch (error) {
+        logger.error('Failed to fetch messages', error, { applicationId });
         handleError(error, toast);
         throw error;
       }
@@ -151,6 +174,12 @@ export const useSendMessage = () => {
       application_id: string;
       content: string;
     }) => {
+      logger.info('Sending message', { 
+        senderId: messageData.sender_id,
+        recipientId: messageData.recipient_id,
+        applicationId: messageData.application_id 
+      });
+      
       const { data, error } = await supabase
         .from('messages')
         .insert(messageData)
@@ -160,14 +189,16 @@ export const useSendMessage = () => {
       if (error) throw error;
       return data;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['messages'] });
+      logger.info('Message sent successfully', { messageId: data.id });
       toast({
         title: 'Message sent',
         description: 'Your message has been delivered.',
       });
     },
     onError: (error) => {
+      logger.error('Failed to send message', error);
       handleError(error, toast);
     },
   });

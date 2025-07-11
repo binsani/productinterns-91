@@ -3,6 +3,7 @@ import { useQuery, UseQueryOptions } from '@tanstack/react-query';
 import { useState, useEffect } from 'react';
 import { handleError } from '@/utils/errorHandler';
 import { useToast } from '@/hooks/use-toast';
+import { logger } from '@/utils/logger';
 
 interface OptimizedQueryOptions<T> extends Omit<UseQueryOptions<T>, 'queryKey' | 'queryFn'> {
   queryKey: any[];
@@ -54,9 +55,13 @@ export const useOptimizedQuery = <T>({
   // Performance monitoring
   useEffect(() => {
     if (query.isError && errorCount > 3) {
-      console.warn(`High error count (${errorCount}) for query:`, queryKey);
+      logger.warn('High error count for query', { 
+        queryKey, 
+        errorCount,
+        error: query.error 
+      });
     }
-  }, [query.isError, errorCount, queryKey]);
+  }, [query.isError, errorCount, queryKey, query.error]);
 
   return {
     ...query,
