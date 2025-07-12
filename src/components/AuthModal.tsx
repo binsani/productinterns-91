@@ -4,7 +4,6 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuthStore, UserRole } from "@/stores/authStore";
@@ -30,12 +29,34 @@ const AuthModal = ({ isOpen, onClose, mode, onModeChange }: AuthModalProps) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    // Clear any previous errors
+    useAuthStore.getState().clearError();
+    
     try {
       let result;
       if (mode === "signin") {
         result = await login(email, password);
       } else {
-        result = await signup(email, password, name, role, companyName);
+        // Validate required fields for signup
+        if (!name.trim()) {
+          toast({
+            title: "Validation Error",
+            description: "Please enter your full name.",
+            variant: "destructive",
+          });
+          return;
+        }
+        
+        if (role === "employer" && !companyName.trim()) {
+          toast({
+            title: "Validation Error", 
+            description: "Please enter your company name.",
+            variant: "destructive",
+          });
+          return;
+        }
+        
+        result = await signup(email, password, name, role, companyName || undefined);
       }
       
       if (result.error) {
@@ -48,18 +69,19 @@ const AuthModal = ({ isOpen, onClose, mode, onModeChange }: AuthModalProps) => {
       }
       
       toast({
-        title: mode === "signin" ? "Welcome back!" : "Account created!",
+        title: mode === "signin" ? "Welcome back!" : "Account created successfully!",
         description: mode === "signin" 
           ? "You've successfully signed in." 
-          : "Please check your email to verify your account.",
+          : "Your account has been created. You can now start using the platform.",
       });
       
       onClose();
       resetForm();
-    } catch (error) {
+    } catch (error: any) {
+      console.error('Auth error:', error);
       toast({
         title: "Error",
-        description: "Something went wrong. Please try again.",
+        description: error.message || "Something went wrong. Please try again.",
         variant: "destructive",
       });
     }
@@ -229,6 +251,7 @@ const AuthModal = ({ isOpen, onClose, mode, onModeChange }: AuthModalProps) => {
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="Create a password"
                     required
+                    minLength={6}
                   />
                 </div>
                 

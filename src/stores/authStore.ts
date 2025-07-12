@@ -109,6 +109,7 @@ export const useAuthStore = create<AuthState>()(
           }
 
           logger.info('Login successful', { userId: data.user?.id });
+          set({ isLoading: false });
           return {};
         } catch (error: any) {
           const errorMessage = 'An unexpected error occurred during login';
@@ -123,6 +124,7 @@ export const useAuthStore = create<AuthState>()(
         logger.info('Signup attempt', { email, role, hasCompanyName: !!companyName });
         
         try {
+          // Use the current origin for redirect URL
           const redirectUrl = `${window.location.origin}/`;
           
           const { data, error } = await supabase.auth.signUp({
@@ -133,7 +135,7 @@ export const useAuthStore = create<AuthState>()(
               data: {
                 name,
                 role,
-                company_name: companyName,
+                company_name: companyName || null,
               },
             },
           });
@@ -144,9 +146,17 @@ export const useAuthStore = create<AuthState>()(
             return { error: error.message };
           }
 
-          logger.info('Signup successful', { userId: data.user?.id });
-          set({ isLoading: false });
-          return {};
+          if (data.user) {
+            logger.info('Signup successful', { userId: data.user.id });
+            // If user is created but not confirmed, still consider it a success
+            set({ isLoading: false });
+            return {};
+          } else {
+            const errorMessage = 'Failed to create user account';
+            logger.error('Signup failed - no user returned', { email });
+            set({ isLoading: false, error: errorMessage });
+            return { error: errorMessage };
+          }
         } catch (error: any) {
           const errorMessage = 'An unexpected error occurred during signup';
           logger.error('Signup exception', error, { email });
@@ -221,47 +231,11 @@ export const useAuthStore = create<AuthState>()(
             set({ profile });
             logger.info('Profile fetched successfully', { userId: user.id, role: profile.role });
           } else {
-            // If no profile exists, create one using user metadata
-            logger.info('No profile found, creating new profile', { userId: user.id });
-            
-            const metadata = user.user_metadata || {};
-            const newProfileData = {
-              id: user.id,
-              email: user.email || '',
-              name: metadata.name || user.email || 'User',
-              role: metadata.role || 'intern',
-              company_name: metadata.company_name,
-            };
-
-            const { data: newProfile, error: insertError } = await supabase
-              .from('profiles')
-              .insert(newProfileData)
-              .select()
-              .single();
-
-            if (insertError) {
-              logger.error('Profile creation error', insertError, { userId: user.id });
-              handleError(insertError);
-              return;
-            }
-
-            if (newProfile) {
-              const profile: UserProfile = {
-                id: newProfile.id,
-                email: newProfile.email,
-                name: newProfile.name,
-                role: newProfile.role,
-                avatar_url: newProfile.avatar_url,
-                company_name: newProfile.company_name,
-                position: newProfile.position,
-                bio: newProfile.bio,
-                skills: newProfile.skills,
-                locations: newProfile.locations,
-                verified: newProfile.verified,
-              };
-              set({ profile });
-              logger.info('New profile created successfully', { userId: user.id, role: profile.role });
-            }
+            logger.warn('No profile found for user', { userId: user.id });
+            // Profile will be created by the database trigger, so we can wait a bit and try again
+            setTimeout(() => {
+              get().fetchProfile();
+            }, 1000);
           }
         } catch (error: any) {
           logger.error('Profile fetch exception', error, { userId: user.id });
