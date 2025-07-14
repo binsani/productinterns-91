@@ -1,9 +1,9 @@
-
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { supabase } from '@/integrations/supabase/client';
 import { handleError } from '@/utils/errorHandler';
 import { logger } from '@/utils/logger';
+import { sanitizeInput } from '@/utils/inputSanitizer';
 import type { User, Session } from '@supabase/supabase-js';
 
 export type UserRole = 'intern' | 'employer' | 'admin';
@@ -97,13 +97,16 @@ export const useAuthStore = create<AuthState>()(
         logger.info('Login attempt', { email });
         
         try {
+          // Sanitize inputs
+          const sanitizedEmail = sanitizeInput.email(email);
+          
           const { data, error } = await supabase.auth.signInWithPassword({
-            email,
+            email: sanitizedEmail,
             password,
           });
 
           if (error) {
-            logger.warn('Login failed', { email, error: error.message });
+            logger.warn('Login failed', { email: sanitizedEmail, error: error.message });
             set({ isLoading: false, error: error.message });
             return { error: error.message };
           }
@@ -121,45 +124,111 @@ export const useAuthStore = create<AuthState>()(
 
       signup: async (email: string, password: string, name: string, role: UserRole, companyName?: string) => {
         set({ isLoading: true, error: null });
-        logger.info('Signup attempt', { email, role, hasCompanyName: !!companyName });
+        logger.info('Signup attempt started', { email, role, hasCompanyName: !!companyName });
         
         try {
-          // Use the current origin for redirect URL
-          const redirectUrl = `${window.location.origin}/`;
+          // Enhanced input sanitization
+          const sanitizedEmail = sanitizeInput.email(email.trim());
+          const sanitizedName = sanitizeInput.text(name.trim());
+          const sanitizedCompanyName = companyName ? sanitizeInput.text(companyName.trim()) : undefined;
           
-          const { data, error } = await supabase.auth.signUp({
-            email,
+          // Enhanced validation
+          if (!sanitizedName || sanitizedName.length < 2) {
+            const errorMessage = 'Name must be at least 2 characters long';
+            set({ isLoading: false, error: errorMessage });
+            return { error: errorMessage };
+          }
+          
+          if (role === 'employer' && (!sanitizedCompanyName || sanitizedCompanyName.length < 2)) {
+            const errorMessage = 'Company name is required for employers';
+            set({ isLoading: false, error: errorMessage });
+            return { error: errorMessage };
+          }
+          
+          if (password.length < 6) {
+            const errorMessage = 'Password must be at least 6 characters long';
+            set({ isLoading: false, error: errorMessage });
+            return { error: errorMessage };
+          }
+
+          // Use the current origin for redirect URL - this is critical
+          const redirectUrl = `${window.location.origin}/`;
+          logger.info('Using redirect URL', { redirectUrl });
+          
+          const signupData = {
+            email: sanitizedEmail,
             password,
             options: {
               emailRedirectTo: redirectUrl,
               data: {
-                name,
-                role,
-                company_name: companyName || null,
+                name: sanitizedName,
+                role: role,
+                company_name: sanitizedCompanyName || null,
               },
             },
+          };
+          
+          logger.info('Sending signup request', { 
+            email: sanitizedEmail, 
+            role, 
+            redirectUrl,
+            metaData: signupData.options.data 
           });
 
+          const { data, error } = await supabase.auth.signUp(signupData);
+
           if (error) {
-            logger.warn('Signup failed', { email, error: error.message });
-            set({ isLoading: false, error: error.message });
-            return { error: error.message };
+            logger.error('Supabase signup error', error, { 
+              email: sanitizedEmail, 
+              errorCode: error.status,
+              errorMessage: error.message 
+            });
+            
+            // Enhanced error message handling
+            let userFriendlyMessage = error.message;
+            if (error.message.includes('duplicate key value')) {
+              userFriendlyMessage = 'An account with this email already exists. Please try signing in instead.';
+            } else if (error.message.includes('invalid email')) {
+              userFriendlyMessage = 'Please enter a valid email address.';
+            } else if (error.message.includes('password')) {
+              userFriendlyMessage = 'Password must be at least 6 characters long.';
+            }
+            
+            set({ isLoading: false, error: userFriendlyMessage });
+            return { error: userFriendlyMessage };
           }
 
           if (data.user) {
-            logger.info('Signup successful', { userId: data.user.id });
-            // If user is created but not confirmed, still consider it a success
-            set({ isLoading: false });
+            logger.info('Signup successful', { 
+              userId: data.user.id, 
+              emailConfirmed: data.user.email_confirmed_at ? 'yes' : 'no',
+              identities: data.user.identities?.length || 0
+            });
+            
+            // Check if email confirmation is required
+            if (!data.user.email_confirmed_at && data.user.identities?.length === 0) {
+              logger.info('Email confirmation required for user', { userId: data.user.id });
+              set({ isLoading: false, error: null });
+              return { 
+                error: 'Please check your email and click the confirmation link to complete your registration.' 
+              };
+            }
+            
+            set({ isLoading: false, error: null });
             return {};
           } else {
-            const errorMessage = 'Failed to create user account';
-            logger.error('Signup failed - no user returned', { email });
+            const errorMessage = 'Failed to create user account - no user data returned';
+            logger.error('Signup failed - no user returned', { email: sanitizedEmail });
             set({ isLoading: false, error: errorMessage });
             return { error: errorMessage };
           }
         } catch (error: any) {
-          const errorMessage = 'An unexpected error occurred during signup';
-          logger.error('Signup exception', error, { email });
+          const errorMessage = error.message || 'An unexpected error occurred during signup';
+          logger.error('Signup exception', error, { 
+            email, 
+            stack: error.stack,
+            name: error.name 
+          });
           set({ isLoading: false, error: errorMessage });
           return { error: errorMessage };
         }

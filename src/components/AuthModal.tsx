@@ -8,7 +8,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuthStore, UserRole } from "@/stores/authStore";
 import { useToast } from "@/hooks/use-toast";
-import { Users, Building2, Shield, Loader2 } from "lucide-react";
+import { Users, Building2, Shield, Loader2, AlertCircle } from "lucide-react";
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -23,7 +23,7 @@ const AuthModal = ({ isOpen, onClose, mode, onModeChange }: AuthModalProps) => {
   const [name, setName] = useState("");
   const [role, setRole] = useState<UserRole>("intern");
   const [companyName, setCompanyName] = useState("");
-  const { login, signup, isLoading } = useAuthStore();
+  const { login, signup, isLoading, error } = useAuthStore();
   const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -32,31 +32,50 @@ const AuthModal = ({ isOpen, onClose, mode, onModeChange }: AuthModalProps) => {
     // Clear any previous errors
     useAuthStore.getState().clearError();
     
+    // Enhanced client-side validation
+    if (!email.trim()) {
+      toast({
+        title: "Validation Error",
+        description: "Please enter your email address.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!password || password.length < 6) {
+      toast({
+        title: "Validation Error",
+        description: "Password must be at least 6 characters long.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     try {
       let result;
       if (mode === "signin") {
-        result = await login(email, password);
+        result = await login(email.trim(), password);
       } else {
-        // Validate required fields for signup
-        if (!name.trim()) {
+        // Enhanced signup validation
+        if (!name.trim() || name.trim().length < 2) {
           toast({
             title: "Validation Error",
-            description: "Please enter your full name.",
+            description: "Please enter your full name (at least 2 characters).",
             variant: "destructive",
           });
           return;
         }
         
-        if (role === "employer" && !companyName.trim()) {
+        if (role === "employer" && (!companyName.trim() || companyName.trim().length < 2)) {
           toast({
             title: "Validation Error", 
-            description: "Please enter your company name.",
+            description: "Please enter your company name (at least 2 characters).",
             variant: "destructive",
           });
           return;
         }
         
-        result = await signup(email, password, name, role, companyName || undefined);
+        result = await signup(email.trim(), password, name.trim(), role, companyName.trim() || undefined);
       }
       
       if (result.error) {
@@ -68,15 +87,23 @@ const AuthModal = ({ isOpen, onClose, mode, onModeChange }: AuthModalProps) => {
         return;
       }
       
+      // Success handling
+      const successMessage = mode === "signin" 
+        ? "You've successfully signed in." 
+        : result.error?.includes('confirmation') 
+          ? "Registration successful! Please check your email for a confirmation link."
+          : "Your account has been created successfully. You can now start using the platform.";
+      
       toast({
         title: mode === "signin" ? "Welcome back!" : "Account created successfully!",
-        description: mode === "signin" 
-          ? "You've successfully signed in." 
-          : "Your account has been created. You can now start using the platform.",
+        description: successMessage,
       });
       
-      onClose();
-      resetForm();
+      // Only close modal if no email confirmation is needed
+      if (!result.error?.includes('confirmation')) {
+        onClose();
+        resetForm();
+      }
     } catch (error: any) {
       console.error('Auth error:', error);
       toast({
@@ -131,6 +158,14 @@ const AuthModal = ({ isOpen, onClose, mode, onModeChange }: AuthModalProps) => {
           </DialogDescription>
         </DialogHeader>
         
+        {/* Enhanced error display */}
+        {error && (
+          <div className="flex items-center gap-2 p-3 text-sm text-red-600 bg-red-50 border border-red-200 rounded-md">
+            <AlertCircle className="h-4 w-4" />
+            <span>{error}</span>
+          </div>
+        )}
+        
         <Tabs value={mode} onValueChange={(value) => onModeChange(value as "signin" | "signup")} className="w-full">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="signin">Sign In</TabsTrigger>
@@ -148,6 +183,7 @@ const AuthModal = ({ isOpen, onClose, mode, onModeChange }: AuthModalProps) => {
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="Enter your email"
                   required
+                  disabled={isLoading}
                 />
               </div>
               
@@ -160,6 +196,8 @@ const AuthModal = ({ isOpen, onClose, mode, onModeChange }: AuthModalProps) => {
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Enter your password"
                   required
+                  minLength={6}
+                  disabled={isLoading}
                 />
               </div>
               
@@ -187,7 +225,7 @@ const AuthModal = ({ isOpen, onClose, mode, onModeChange }: AuthModalProps) => {
                         ? "border-blue-500 bg-blue-50" 
                         : "border-gray-200 hover:border-gray-300"
                     }`}
-                    onClick={() => setRole(option.value)}
+                    onClick={() => !isLoading && setRole(option.value)}
                   >
                     <CardContent className="p-3 text-center">
                       <option.icon className={`h-6 w-6 mx-auto mb-1 ${
@@ -213,6 +251,8 @@ const AuthModal = ({ isOpen, onClose, mode, onModeChange }: AuthModalProps) => {
                     onChange={(e) => setName(e.target.value)}
                     placeholder="Enter your full name"
                     required
+                    minLength={2}
+                    disabled={isLoading}
                   />
                 </div>
                 
@@ -225,6 +265,7 @@ const AuthModal = ({ isOpen, onClose, mode, onModeChange }: AuthModalProps) => {
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="Enter your email"
                     required
+                    disabled={isLoading}
                   />
                 </div>
                 
@@ -238,6 +279,8 @@ const AuthModal = ({ isOpen, onClose, mode, onModeChange }: AuthModalProps) => {
                       onChange={(e) => setCompanyName(e.target.value)}
                       placeholder="Enter your company name"
                       required
+                      minLength={2}
+                      disabled={isLoading}
                     />
                   </div>
                 )}
@@ -249,9 +292,10 @@ const AuthModal = ({ isOpen, onClose, mode, onModeChange }: AuthModalProps) => {
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Create a password"
+                    placeholder="Create a password (min. 6 characters)"
                     required
                     minLength={6}
+                    disabled={isLoading}
                   />
                 </div>
                 
