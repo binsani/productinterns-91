@@ -43,10 +43,6 @@ export const useServiceWorker = () => {
               toast({
                 title: 'Update Available',
                 description: 'A new version of the app is available. Refresh to update.',
-                action: {
-                  label: 'Refresh',
-                  onClick: () => window.location.reload()
-                }
               });
             }
           });

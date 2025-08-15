@@ -38,14 +38,15 @@ export const performanceMonitoring = {
       // Track First Input Delay (FID)
       new PerformanceObserver((list) => {
         const entries = list.getEntries();
-        entries.forEach((entry) => {
-          logger.info('FID recorded', { value: entry.processingStart - entry.startTime });
+        entries.forEach((entry: any) => {
+          const fidValue = entry.processingStart ? entry.processingStart - entry.startTime : entry.duration;
+          logger.info('FID recorded', { value: fidValue });
           
           if (analyticsConfig.enabled) {
             analytics.track('web_vital', {
               name: 'FID',
-              value: entry.processingStart - entry.startTime,
-              rating: (entry.processingStart - entry.startTime) > 100 ? 'poor' : (entry.processingStart - entry.startTime) > 50 ? 'needs-improvement' : 'good'
+              value: fidValue,
+              rating: fidValue > 100 ? 'poor' : fidValue > 50 ? 'needs-improvement' : 'good'
             });
           }
         });

@@ -15,7 +15,7 @@ export const LazyWrapper = ({
   errorFallback
 }: LazyWrapperProps) => {
   return (
-    <ErrorBoundary fallback={errorFallback}>
+    <ErrorBoundary>
       <Suspense fallback={fallback}>
         {children}
       </Suspense>
@@ -32,7 +32,7 @@ export const withLazyLoading = <P extends object>(
   
   return (props: P) => (
     <LazyWrapper fallback={loadingComponent}>
-      <LazyComponent {...props} />
+      <LazyComponent {...(props as any)} />
     </LazyWrapper>
   );
 };
