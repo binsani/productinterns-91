@@ -1,73 +1,262 @@
-# Welcome to your Lovable project
+# InternshipConnect
 
-## Project info
+A comprehensive platform connecting students with internship opportunities and employers with talented candidates.
 
-**URL**: https://lovable.dev/projects/533bf15f-dac3-414b-bbbc-ef4069921d30
+## 🚀 Features
 
-## How can I edit this code?
+### For Students
+- **Browse Opportunities**: Discover internships from top companies
+- **Smart Applications**: Apply with optimized resumes and cover letters
+- **Application Tracking**: Monitor your application status in real-time
+- **Profile Builder**: Create compelling professional profiles
+- **Learning Center**: Access courses and certifications
+- **Interview Scheduler**: Seamlessly schedule and join interviews
 
-There are several ways of editing your application.
+### For Employers
+- **Post Internships**: Create detailed internship listings
+- **Candidate Management**: Review and manage applications efficiently
+- **Interview Tools**: Schedule and conduct interviews
+- **Analytics**: Track posting performance and candidate metrics
+- **Messaging**: Direct communication with candidates
 
-**Use Lovable**
+### For Administrators
+- **User Management**: Comprehensive user and role management
+- **Content Moderation**: Review and moderate platform content
+- **Analytics Dashboard**: Monitor platform performance
+- **Support System**: Handle user inquiries and tickets
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/533bf15f-dac3-414b-bbbc-ef4069921d30) and start prompting.
+## 🛠️ Technology Stack
 
-Changes made via Lovable will be committed automatically to this repo.
+- **Frontend**: React 18, TypeScript, Tailwind CSS
+- **Backend**: Supabase (PostgreSQL, Auth, Storage, Edge Functions)
+- **State Management**: Zustand, React Query
+- **UI Components**: Shadcn/ui, Radix UI
+- **Deployment**: Lovable Platform
+- **Testing**: Jest, React Testing Library
 
-**Use your preferred IDE**
+## 📦 Installation
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+### Prerequisites
+- Node.js 18+ 
+- Bun (recommended) or npm
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+### Setup
+1. Clone the repository
+```bash
+git clone <repository-url>
+cd internship-connect
+```
 
-Follow these steps:
+2. Install dependencies
+```bash
+bun install
+# or
+npm install
+```
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+3. Environment Configuration
+The app uses Supabase for backend services. Configuration is handled automatically through the Lovable platform.
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+4. Start development server
+```bash
+bun run dev
+# or
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+Visit `http://localhost:8080` to view the application.
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## 🏗️ Architecture
 
-**Use GitHub Codespaces**
+### Frontend Structure
+```
+src/
+├── components/          # React components
+│   ├── admin/          # Admin-specific components
+│   ├── employer/       # Employer dashboard components
+│   ├── intern/         # Student/intern components
+│   ├── shared/         # Reusable components
+│   └── ui/             # Base UI components
+├── config/             # Configuration files
+├── hooks/              # Custom React hooks
+├── pages/              # Page components
+├── stores/             # State management
+├── utils/              # Utility functions
+└── integrations/       # External service integrations
+```
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+### Key Features
+- **Role-based Access Control**: Different interfaces for students, employers, and admins
+- **Real-time Updates**: Live notifications and messaging
+- **Progressive Web App**: Offline capabilities and mobile-optimized
+- **Security First**: Comprehensive security headers and input validation
+- **Performance Optimized**: Code splitting, lazy loading, and caching
 
-## What technologies are used for this project?
+## 🔒 Security
 
-This project is built with:
+### Implemented Security Measures
+- Content Security Policy (CSP)
+- Cross-Site Scripting (XSS) protection
+- Cross-Site Request Forgery (CSRF) protection
+- Input sanitization and validation
+- Rate limiting
+- Secure file uploads
+- Row Level Security (RLS) in database
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+### Authentication & Authorization
+- JWT-based authentication via Supabase Auth
+- Role-based access control (RBAC)
+- Secure password policies
+- Email verification
+- Multi-factor authentication support
 
-## How can I deploy this project?
+## 🚀 Deployment
 
-Simply open [Lovable](https://lovable.dev/projects/533bf15f-dac3-414b-bbbc-ef4069921d30) and click on Share -> Publish.
+### Production Deployment
+The application is deployed on the Lovable platform with automatic deployments from the main branch.
 
-## Can I connect a custom domain to my Lovable project?
+### Environment Configuration
+- **Development**: Local development with hot reloading
+- **Production**: Optimized build with performance monitoring
 
-Yes, you can!
+### Custom Domain Setup
+1. Go to Project Settings → Domains
+2. Add your custom domain
+3. Configure DNS records as provided
+4. SSL certificates are automatically provisioned
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+## 🧪 Testing
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+### Running Tests
+```bash
+# Run all tests
+bun test
+
+# Run tests in watch mode
+bun test --watch
+
+# Run tests with coverage
+bun test --coverage
+```
+
+### Testing Strategy
+- **Unit Tests**: Component and utility function testing
+- **Integration Tests**: API and database interaction testing
+- **E2E Tests**: User workflow testing
+- **Performance Tests**: Load time and responsiveness testing
+- **Accessibility Tests**: WCAG compliance testing
+
+## 📊 Monitoring & Analytics
+
+### Performance Monitoring
+- Core Web Vitals tracking
+- Resource loading performance
+- Error tracking and reporting
+- User interaction analytics
+
+### Security Monitoring
+- Failed authentication attempts
+- Suspicious activity detection
+- Security header compliance
+- Vulnerability scanning
+
+## 🤝 Contributing
+
+### Development Workflow
+1. Create a feature branch from `main`
+2. Make your changes following the coding standards
+3. Add tests for new functionality
+4. Run the test suite
+5. Submit a pull request
+
+### Coding Standards
+- TypeScript for type safety
+- ESLint for code quality
+- Prettier for code formatting
+- Semantic commit messages
+- Component composition over inheritance
+
+## 📱 Progressive Web App
+
+### PWA Features
+- **Offline Support**: Core functionality available offline
+- **Push Notifications**: Real-time updates and reminders
+- **App-like Experience**: Install on mobile and desktop
+- **Background Sync**: Sync data when connection is restored
+
+### Service Worker
+The app includes a comprehensive service worker that provides:
+- Static asset caching
+- API response caching
+- Offline fallbacks
+- Background synchronization
+- Push notification handling
+
+## 🔧 Configuration
+
+### Environment Variables
+The application configuration is managed through:
+- `src/config/environment.ts` - Environment-specific settings
+- `src/config/security.ts` - Security configuration
+- `src/config/monitoring.ts` - Analytics and monitoring setup
+
+### Feature Flags
+Feature flags are available for:
+- Development tools
+- Analytics tracking
+- Error reporting
+- Performance monitoring
+
+## 📚 API Documentation
+
+### Supabase Integration
+The application uses Supabase for:
+- **Authentication**: User registration, login, password reset
+- **Database**: PostgreSQL with Row Level Security
+- **Storage**: File uploads and management
+- **Edge Functions**: Custom business logic
+- **Real-time**: Live updates and notifications
+
+### Database Schema
+Key tables include:
+- `profiles` - User profile information
+- `internships` - Internship listings
+- `applications` - Application tracking
+- `messages` - Communication system
+- `notifications` - User notifications
+
+## 🚨 Troubleshooting
+
+### Common Issues
+
+**Build Errors**
+- Ensure all dependencies are installed
+- Check TypeScript configuration
+- Verify import paths
+
+**Authentication Issues**
+- Check Supabase configuration
+- Verify redirect URLs
+- Ensure proper environment setup
+
+**Performance Issues**
+- Enable code splitting
+- Optimize images and assets
+- Check network requests
+
+For detailed troubleshooting, visit: [Troubleshooting Guide](https://docs.lovable.dev/tips-tricks/troubleshooting)
+
+## 📄 License
+
+This project is proprietary and confidential. All rights reserved.
+
+## 📞 Support
+
+For technical support or questions:
+- Create an issue in the repository
+- Contact the development team
+- Visit the Lovable documentation
+
+---
+
+Built with ❤️ using [Lovable](https://lovable.dev)
