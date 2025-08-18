@@ -81,23 +81,23 @@ const Index = () => {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50">
       {/* Header */}
       <header className="border-b bg-white/80 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+        <div className="container mx-auto px-4 py-3 sm:py-4 flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-green-600 rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-sm">PI</span>
             </div>
-            <span className="text-xl font-bold text-gray-900">Product Interns</span>
+            <span className="text-lg sm:text-xl font-bold text-gray-900">Product Interns</span>
           </div>
           <nav className="hidden md:flex items-center space-x-6">
             <a href="#features" className="text-gray-600 hover:text-blue-600 transition-colors">Features</a>
             <a href="#how-it-works" className="text-gray-600 hover:text-blue-600 transition-colors">How it Works</a>
             <a href="#pricing" className="text-gray-600 hover:text-blue-600 transition-colors">Pricing</a>
           </nav>
-          <div className="flex items-center space-x-3">
-            <Button variant="ghost" onClick={() => handleAuthClick("signin")}>
+          <div className="flex items-center space-x-2 sm:space-x-3">
+            <Button variant="ghost" size="sm" className="hidden sm:inline-flex" onClick={() => handleAuthClick("signin")}>
               Sign In
             </Button>
-            <Button onClick={() => handleAuthClick("signup")} className="bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-700 hover:to-green-700">
+            <Button size="sm" onClick={() => handleAuthClick("signup")} className="bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-700 hover:to-green-700 text-xs sm:text-sm px-3 sm:px-4">
               Get Started
             </Button>
           </div>
@@ -105,48 +105,56 @@ const Index = () => {
       </header>
 
       {/* Hero Section */}
-      <section className="container mx-auto px-4 py-16 md:py-24">
+      <section className="container mx-auto px-4 py-12 sm:py-16 md:py-24">
         <div className="text-center max-w-4xl mx-auto">
-          <Badge className="mb-4 bg-blue-100 text-blue-700 hover:bg-blue-100">
+          <Badge className="mb-4 bg-blue-100 text-blue-700 hover:bg-blue-100 text-xs sm:text-sm">
             🚀 Connecting Talent with Opportunity
           </Badge>
-          <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-4 sm:mb-6 leading-tight">
             Your Gateway to 
             <span className="bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent"> Product Management</span> Excellence
           </h1>
-          <p className="text-xl text-gray-600 mb-8 leading-relaxed">
+          <p className="text-base sm:text-lg md:text-xl text-gray-600 mb-6 sm:mb-8 leading-relaxed px-2">
             Connect passionate interns with leading companies. Build your product management career 
             or find exceptional talent through our comprehensive platform designed for the modern workforce.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" onClick={() => handleAuthClick("signup")} className="bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-700 hover:to-green-700 text-lg px-8 py-3">
-              Start Your Journey <ArrowRight className="ml-2 h-5 w-5" />
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center px-4">
+            <Button 
+              size="lg" 
+              onClick={() => handleAuthClick("signup")} 
+              className="bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-700 hover:to-green-700 text-sm sm:text-lg px-6 sm:px-8 py-3 w-full sm:w-auto"
+            >
+              Start Your Journey <ArrowRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5" />
             </Button>
-            <Button size="lg" variant="outline" className="text-lg px-8 py-3">
+            <Button 
+              size="lg" 
+              variant="outline" 
+              className="text-sm sm:text-lg px-6 sm:px-8 py-3 w-full sm:w-auto"
+            >
               Watch Demo
             </Button>
           </div>
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mt-16">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 md:gap-8 mt-12 sm:mt-16">
           {stats.map((stat, index) => (
             <div key={index} className="text-center">
-              <div className="text-3xl font-bold text-gray-900 mb-2">{stat.value}</div>
-              <div className="text-gray-600">{stat.label}</div>
+              <div className="text-2xl sm:text-3xl font-bold text-gray-900 mb-1 sm:mb-2">{stat.value}</div>
+              <div className="text-sm sm:text-base text-gray-600">{stat.label}</div>
             </div>
           ))}
         </div>
       </section>
 
       {/* User Types Section */}
-      <section className="bg-white py-16">
+      <section className="bg-white py-12 sm:py-16">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Built for Every Stakeholder</h2>
-            <p className="text-xl text-gray-600">Tailored experiences for interns, employers, and administrators</p>
+          <div className="text-center mb-8 sm:mb-12">
+            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2 sm:mb-4">Built for Every Stakeholder</h2>
+            <p className="text-lg sm:text-xl text-gray-600">Tailored experiences for interns, employers, and administrators</p>
           </div>
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
             <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
               <CardHeader className="text-center pb-4">
                 <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -235,13 +243,13 @@ const Index = () => {
       </section>
 
       {/* Features Section */}
-      <section id="features" className="py-16">
+      <section id="features" className="py-12 sm:py-16">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Powerful Features</h2>
-            <p className="text-xl text-gray-600">Everything you need to succeed in product management</p>
+          <div className="text-center mb-8 sm:mb-12">
+            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2 sm:mb-4">Powerful Features</h2>
+            <p className="text-lg sm:text-xl text-gray-600">Everything you need to succeed in product management</p>
           </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
             {features.map((feature, index) => (
               <Card key={index} className="border-0 shadow-md hover:shadow-lg transition-shadow">
                 <CardHeader className="text-center">
@@ -260,20 +268,25 @@ const Index = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="bg-gradient-to-r from-blue-600 to-green-600 py-16">
+      <section className="bg-gradient-to-r from-blue-600 to-green-600 py-12 sm:py-16">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold text-white mb-4">Ready to Transform Your Career?</h2>
-          <p className="text-xl text-blue-100 mb-8">Join thousands of interns and employers already using our platform</p>
-          <Button size="lg" variant="secondary" onClick={() => handleAuthClick("signup")} className="text-lg px-8 py-3">
-            Get Started Today <ArrowRight className="ml-2 h-5 w-5" />
+          <h2 className="text-2xl sm:text-3xl font-bold text-white mb-3 sm:mb-4">Ready to Transform Your Career?</h2>
+          <p className="text-lg sm:text-xl text-blue-100 mb-6 sm:mb-8">Join thousands of interns and employers already using our platform</p>
+          <Button 
+            size="lg" 
+            variant="secondary" 
+            onClick={() => handleAuthClick("signup")} 
+            className="text-sm sm:text-lg px-6 sm:px-8 py-3 w-full sm:w-auto max-w-xs sm:max-w-none"
+          >
+            Get Started Today <ArrowRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5" />
           </Button>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-white py-12">
+      <footer className="bg-gray-900 text-white py-8 sm:py-12">
         <div className="container mx-auto px-4">
-          <div className="grid md:grid-cols-4 gap-8">
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
             <div>
               <div className="flex items-center space-x-2 mb-4">
                 <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-green-600 rounded-lg flex items-center justify-center">
