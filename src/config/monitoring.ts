@@ -157,12 +157,8 @@ export const analytics = {
         (window as any).gtag('event', event, properties);
       }
 
-      // Example: Custom analytics endpoint
-      fetch('/api/analytics', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ event, properties, timestamp: Date.now() })
-      }).catch(err => logger.error('Failed to send analytics', err));
+      // Custom analytics disabled - no backend in this stack
+      // Replace with Supabase Edge Function or external service if needed
     }
   },
 

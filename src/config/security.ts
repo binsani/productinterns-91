@@ -7,8 +7,8 @@ export const securityConfig = {
     'default-src': ["'self'"],
     'script-src': [
       "'self'",
-      "'unsafe-inline'", // Required for Vite in development
-      'https://cdn.gpteng.co',
+      // Only include unsafe-inline in development
+      ...(import.meta.env.MODE === 'development' ? ["'unsafe-inline'"] : []),
       'https://zwzqedkkvdjlwzqmvdsd.supabase.co'
     ],
     'style-src': ["'self'", "'unsafe-inline'"],

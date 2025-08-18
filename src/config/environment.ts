@@ -14,8 +14,8 @@ interface EnvironmentConfig {
 const getEnvironmentConfig = (): EnvironmentConfig => {
   // Validate required environment variables
   const requiredVars = {
-    SUPABASE_URL: "https://zwzqedkkvdjlwzqmvdsd.supabase.co",
-    SUPABASE_ANON_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp3enFlZGtrdmRqbHd6cW12ZHNkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA2OTM3NDQsImV4cCI6MjA2NjI2OTc0NH0.gs2qTWfs2sxXAWMtWagbpSHqL4_yc-SJh-aDfrUGOoI"
+    SUPABASE_URL: import.meta.env.VITE_SUPABASE_URL || "https://zwzqedkkvdjlwzqmvdsd.supabase.co",
+    SUPABASE_ANON_KEY: import.meta.env.VITE_SUPABASE_ANON_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp3enFlZGtrdmRqbHd6cW12ZHNkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA2OTM3NDQsImV4cCI6MjA2NjI2OTc0NH0.gs2qTWfs2sxXAWMtWagbpSHqL4_yc-SJh-aDfrUGOoI"
   };
 
   // Check for missing required variables
@@ -28,10 +28,10 @@ const getEnvironmentConfig = (): EnvironmentConfig => {
   return {
     SUPABASE_URL: requiredVars.SUPABASE_URL,
     SUPABASE_ANON_KEY: requiredVars.SUPABASE_ANON_KEY,
-    NODE_ENV: (process.env.NODE_ENV as any) || 'development',
-    APP_URL: window.location.origin,
-    ENABLE_LOGGING: process.env.NODE_ENV === 'development',
-    ENABLE_ANALYTICS: process.env.NODE_ENV === 'production',
+    NODE_ENV: (import.meta.env.MODE as any) || 'development',
+    APP_URL: typeof window !== 'undefined' ? window.location.origin : 'http://localhost:5173',
+    ENABLE_LOGGING: import.meta.env.MODE === 'development',
+    ENABLE_ANALYTICS: import.meta.env.MODE === 'production',
     MAX_FILE_SIZE: 5 * 1024 * 1024, // 5MB
     SUPPORTED_FILE_TYPES: [
       'application/pdf',
