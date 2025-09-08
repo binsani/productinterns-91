@@ -1,122 +1,85 @@
-
-import { useState, useEffect, useCallback } from 'react';
-
-// Debounce hook for search inputs
-export const useDebounce = <T>(value: T, delay: number): T => {
-  const [debouncedValue, setDebouncedValue] = useState<T>(value);
-
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedValue(value);
-    }, delay);
-
-    return () => {
-      clearTimeout(handler);
-    };
-  }, [value, delay]);
-
-  return debouncedValue;
-};
-
-// Throttle hook for scroll events
-export const useThrottle = <T extends (...args: any[]) => any>(
-  callback: T,
-  delay: number
-): T => {
-  const [shouldWait, setShouldWait] = useState(false);
-
-  return useCallback(
-    (...args: Parameters<T>) => {
-      if (shouldWait) return;
-
-      callback(...args);
-      setShouldWait(true);
-      setTimeout(() => setShouldWait(false), delay);
-    },
-    [callback, delay, shouldWait]
-  ) as T;
-};
-
-// Intersection Observer hook for lazy loading
-export const useIntersectionObserver = (
-  elementRef: React.RefObject<Element>,
-  options?: IntersectionObserverInit
-) => {
-  const [isIntersecting, setIsIntersecting] = useState(false);
-
-  useEffect(() => {
-    const element = elementRef.current;
-    if (!element) return;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        setIsIntersecting(entry.isIntersecting);
-      },
-      options
-    );
-
-    observer.observe(element);
-    return () => observer.unobserve(element);
-  }, [elementRef, options]);
-
-  return isIntersecting;
-};
-
 // Performance monitoring utilities
-export const performanceMonitor = {
-  // Measure component render time
-  measureRender: (componentName: string) => {
-    const start = performance.now();
-    return () => {
-      const end = performance.now();
-      const duration = end - start;
-      
-      if (duration > 16) { // Warn if render takes longer than 16ms
-        console.warn(`${componentName} render took ${duration.toFixed(2)}ms`);
+export const performance = {
+  // Mark performance events
+  mark: (name: string) => {
+    if ('performance' in window && 'mark' in window.performance) {
+      window.performance.mark(name);
+    }
+  },
+
+  // Measure time between marks
+  measure: (name: string, startMark: string, endMark?: string) => {
+    if ('performance' in window && 'measure' in window.performance) {
+      try {
+        if (endMark) {
+          window.performance.measure(name, startMark, endMark);
+        } else {
+          window.performance.measure(name, startMark);
+        }
+        
+        const measures = window.performance.getEntriesByName(name, 'measure');
+        const latestMeasure = measures[measures.length - 1];
+        return latestMeasure?.duration || 0;
+      } catch (error) {
+        console.warn('Performance measurement failed:', error);
+        return 0;
       }
+    }
+    return 0;
+  },
+
+  // Get web vitals
+  getWebVitals: () => {
+    if (!('performance' in window)) return null;
+
+    const navigation = window.performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
+    if (!navigation) return null;
+
+    return {
+      // First Contentful Paint
+      fcp: navigation.responseStart - navigation.fetchStart,
       
-      return duration;
+      // Largest Contentful Paint (approximation)
+      lcp: navigation.loadEventEnd - navigation.fetchStart,
+      
+      // Time to Interactive (approximation)
+      tti: navigation.domInteractive - navigation.fetchStart,
+      
+      // First Input Delay (needs to be measured with real interactions)
+      fid: 0,
+      
+      // Cumulative Layout Shift (needs to be measured with layout shift events)
+      cls: 0
     };
   },
 
-  // Measure async operation time
-  measureAsync: async <T>(
-    operation: () => Promise<T>,
-    operationName: string
-  ): Promise<T> => {
-    const start = performance.now();
-    try {
-      const result = await operation();
-      const end = performance.now();
-      const duration = end - start;
-      
-      console.log(`${operationName} took ${duration.toFixed(2)}ms`);
-      return result;
-    } catch (error) {
-      const end = performance.now();
-      const duration = end - start;
-      console.error(`${operationName} failed after ${duration.toFixed(2)}ms:`, error);
-      throw error;
+  // Resource loading optimization
+  prefetchResource: (url: string, type: 'script' | 'style' | 'image' | 'fetch' = 'fetch') => {
+    const link = document.createElement('link');
+    link.rel = 'prefetch';
+    link.href = url;
+    if (type !== 'fetch') {
+      link.as = type;
     }
+    document.head.appendChild(link);
   },
 
-  // Report Web Vitals
-  reportWebVitals: (metric: any) => {
-    console.log('Web Vital:', metric);
-    
-    // In production, send to analytics
-    if (process.env.NODE_ENV === 'production') {
-      // Send to analytics service
-      // analytics.track('web_vital', metric);
+  // Preload critical resources
+  preloadResource: (url: string, type: 'script' | 'style' | 'image' | 'font', crossorigin?: boolean) => {
+    const link = document.createElement('link');
+    link.rel = 'preload';
+    link.href = url;
+    link.as = type;
+    if (crossorigin) {
+      link.crossOrigin = 'anonymous';
     }
-  }
-};
+    document.head.appendChild(link);
+  },
 
-// Memory usage monitoring
-export const memoryMonitor = {
-  checkMemoryUsage: () => {
-    if ('memory' in performance) {
-      const memory = (performance as any).memory;
+  // Memory usage monitoring
+  getMemoryUsage: () => {
+    if ('memory' in window.performance) {
+      const memory = (window.performance as any).memory;
       return {
         used: Math.round(memory.usedJSHeapSize / 1048576), // MB
         total: Math.round(memory.totalJSHeapSize / 1048576), // MB
@@ -124,17 +87,5 @@ export const memoryMonitor = {
       };
     }
     return null;
-  },
-
-  logMemoryUsage: (context: string) => {
-    const usage = memoryMonitor.checkMemoryUsage();
-    if (usage) {
-      console.log(`Memory usage in ${context}:`, usage);
-      
-      // Warn if memory usage is high
-      if (usage.used / usage.limit > 0.8) {
-        console.warn('High memory usage detected!');
-      }
-    }
   }
 };

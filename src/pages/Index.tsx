@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Users, Building2, Shield, ArrowRight, CheckCircle, Target, TrendingUp } from "lucide-react";
 import AuthModal from "@/components/AuthModal";
 import { useAuthStore } from "@/stores/authStore";
+import { OrganizationData, WebSiteData } from "@/components/SEO/StructuredData";
 import InternDashboard from "@/components/dashboards/InternDashboard";
 import EmployerDashboard from "@/components/dashboards/EmployerDashboard";
 import AdminDashboard from "@/components/dashboards/AdminDashboard";
@@ -79,6 +80,8 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50">
+      <OrganizationData />
+      <WebSiteData />
       {/* Header */}
       <header className="border-b bg-white/80 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 py-3 sm:py-4 flex items-center justify-between">
@@ -105,7 +108,7 @@ const Index = () => {
       </header>
 
       {/* Hero Section */}
-      <section className="container mx-auto px-4 py-12 sm:py-16 md:py-24">
+      <main id="main-content" className="container mx-auto px-4 py-12 sm:py-16 md:py-24">
         <div className="text-center max-w-4xl mx-auto">
           <Badge className="mb-4 bg-blue-100 text-blue-700 hover:bg-blue-100 text-xs sm:text-sm">
             🚀 Connecting Talent with Opportunity
@@ -145,7 +148,7 @@ const Index = () => {
             </div>
           ))}
         </div>
-      </section>
+      </main>
 
       {/* User Types Section */}
       <section className="bg-white py-12 sm:py-16">
