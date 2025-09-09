@@ -4,9 +4,13 @@ import { supabase } from '@/integrations/supabase/client';
 import { handleError } from '@/utils/errorHandler';
 import { useToast } from '@/hooks/use-toast';
 import { logger } from '@/utils/logger';
+import { useRealtimeApplications } from './useRealtimeApplications';
 
 export const useApplications = (userId?: string) => {
   const { toast } = useToast();
+  
+  // Enable real-time updates for applications
+  useRealtimeApplications();
   
   return useQuery({
     queryKey: ['applications', userId],

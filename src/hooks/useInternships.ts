@@ -4,9 +4,13 @@ import { supabase } from '@/integrations/supabase/client';
 import { handleError } from '@/utils/errorHandler';
 import { useToast } from '@/hooks/use-toast';
 import { logger } from '@/utils/logger';
+import { useRealtimeInternships } from './useRealtimeInternships';
 
 export const useInternships = (filters?: { location?: string; skills?: string[] }) => {
   const { toast } = useToast();
+  
+  // Enable real-time updates for internships
+  useRealtimeInternships();
   
   return useQuery({
     queryKey: ['internships', filters],

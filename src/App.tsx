@@ -12,6 +12,7 @@ import { OfflineIndicator } from "@/components/PWA/OfflineIndicator";
 import { SkipToContent } from "@/components/accessibility/SkipToContent";
 import { CriticalCSS } from "@/components/utils/CriticalCSS";
 import { usePageTracking } from "@/hooks/usePageTracking";
+import { useRealtimeData } from "@/hooks/useRealtimeData";
 import Index from "./pages/Index";
 import UnauthorizedPage from "./pages/UnauthorizedPage";
 import NotFound from "./pages/NotFound";
@@ -67,6 +68,7 @@ const App = () => {
 
 const PageTracker = () => {
   usePageTracking();
+  useRealtimeData(); // Enable real-time updates
   return null;
 };
 

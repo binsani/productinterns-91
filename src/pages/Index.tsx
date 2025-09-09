@@ -6,6 +6,8 @@ import { Users, Building2, Shield, ArrowRight, CheckCircle, Target, TrendingUp }
 import AuthModal from "@/components/AuthModal";
 import { useAuthStore } from "@/stores/authStore";
 import { OrganizationData, WebSiteData } from "@/components/SEO/StructuredData";
+import { RealtimeStatusIndicator } from "@/components/shared/RealtimeStatusIndicator";
+import { LiveDataFeed } from "@/components/shared/LiveDataFeed";
 import InternDashboard from "@/components/dashboards/InternDashboard";
 import EmployerDashboard from "@/components/dashboards/EmployerDashboard";
 import AdminDashboard from "@/components/dashboards/AdminDashboard";
@@ -31,16 +33,34 @@ const Index = () => {
 
   // If user is logged in and has a profile, show their respective dashboard
   if (user && profile) {
-    switch (profile.role) {
-      case "intern":
-        return <InternDashboard />;
-      case "employer":
-        return <EmployerDashboard />;
-      case "admin":
-        return <AdminDashboard />;
-      default:
-        return <InternDashboard />;
-    }
+    const DashboardComponent = {
+      intern: InternDashboard,
+      employer: EmployerDashboard,
+      admin: AdminDashboard
+    }[profile.role] || InternDashboard;
+
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50">
+        <OrganizationData />
+        <WebSiteData />
+        
+        {/* Real-time status indicator */}
+        <div className="fixed top-4 right-4 z-50">
+          <RealtimeStatusIndicator />
+        </div>
+        
+        <div className="grid grid-cols-1 xl:grid-cols-4 gap-6 p-6 min-h-screen">
+          <div className="xl:col-span-3">
+            <DashboardComponent />
+          </div>
+          <div className="xl:col-span-1">
+            <div className="sticky top-6">
+              <LiveDataFeed />
+            </div>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   const handleAuthClick = (mode: "signin" | "signup") => {
