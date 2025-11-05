@@ -10,7 +10,7 @@ import { useAuthStore } from '@/stores/authStore';
  * Call this hook in your main App component to enable real-time updates across the entire application
  */
 export const useRealtimeData = () => {
-  const { user } = useAuthStore();
+  const { user, profile } = useAuthStore();
 
   // Enable real-time updates for all data types
   useRealtimeNotifications();
@@ -18,10 +18,8 @@ export const useRealtimeData = () => {
   useRealtimeProfiles();
   useRealtimeCompanyProfiles();
 
-  // Role-specific real-time subscriptions
-  if (user?.id) {
-    const profile = user as any; // Type assertion for profile data
-    
+  // Role-specific real-time subscriptions based on user profile
+  if (user?.id && profile) {
     if (profile.role === 'intern') {
       useRealtimeApplications();
     } else if (profile.role === 'employer') {

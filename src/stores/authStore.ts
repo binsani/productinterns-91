@@ -271,31 +271,44 @@ export const useAuthStore = create<AuthState>()(
         logger.info('Fetching user profile', { userId: user.id });
 
         try {
-          const { data, error } = await supabase
+          // Fetch profile data
+          const { data: profileData, error: profileError } = await supabase
             .from('profiles')
             .select('*')
             .eq('id', user.id)
             .maybeSingle();
 
-          if (error) {
-            logger.error('Profile fetch error', error, { userId: user.id });
-            handleError(error);
+          if (profileError) {
+            logger.error('Profile fetch error', profileError, { userId: user.id });
+            handleError(profileError);
             return;
           }
 
-          if (data) {
+          // Fetch role from secure user_roles table
+          const { data: roleData, error: roleError } = await supabase
+            .from('user_roles')
+            .select('role')
+            .eq('user_id', user.id)
+            .maybeSingle();
+
+          if (roleError) {
+            logger.error('Role fetch error', roleError, { userId: user.id });
+            // Continue with default role if role fetch fails
+          }
+
+          if (profileData) {
             const profile: UserProfile = {
-              id: data.id,
-              email: data.email,
-              name: data.name,
-              role: data.role,
-              avatar_url: data.avatar_url,
-              company_name: data.company_name,
-              position: data.position,
-              bio: data.bio,
-              skills: data.skills,
-              locations: data.locations,
-              verified: data.verified,
+              id: profileData.id,
+              email: profileData.email,
+              name: profileData.name,
+              role: (roleData?.role as UserRole) || 'intern',
+              avatar_url: profileData.avatar_url,
+              company_name: profileData.company_name,
+              position: profileData.position,
+              bio: profileData.bio,
+              skills: profileData.skills,
+              locations: profileData.locations,
+              verified: profileData.verified,
             };
             set({ profile });
             logger.info('Profile fetched successfully', { userId: user.id, role: profile.role });
