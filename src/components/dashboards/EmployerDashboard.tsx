@@ -18,7 +18,8 @@ import {
   MapPin,
   Eye,
   Clock,
-  Settings
+  Settings,
+  Briefcase
 } from "lucide-react";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import ApplicantManagement from "@/components/employer/ApplicantManagement";
@@ -36,6 +37,7 @@ import WelcomeHero from "@/components/shared/WelcomeHero";
 import InternshipCard from "@/components/shared/InternshipCard";
 import ApplicationCard from "@/components/shared/ApplicationCard";
 import ScheduleInterviewModal from "@/components/employer/ScheduleInterviewModal";
+import JobPostingsManagement from "@/components/employer/JobPostingsManagement";
 
 const EmployerDashboard = () => {
   const { profile } = useAuthStore();
@@ -47,6 +49,7 @@ const EmployerDashboard = () => {
   const navigationItems = [
     { id: "overview", label: "Overview", icon: TrendingUp },
     { id: "company", label: "Company Profile", icon: Building2 },
+    { id: "jobs", label: "Job Postings", icon: Briefcase },
     { id: "postings", label: "PM Internships", icon: Plus },
     { id: "applicants", label: "Applicants", icon: Users },
     { id: "messages", label: "Messages", icon: MessageSquare },
@@ -239,6 +242,8 @@ const EmployerDashboard = () => {
         return renderOverview();
       case "company":
         return renderCompanyProfile();
+      case "jobs":
+        return <JobPostingsManagement />;
       case "postings":
         return <InternshipPostingsManagement />;
       case "applicants":

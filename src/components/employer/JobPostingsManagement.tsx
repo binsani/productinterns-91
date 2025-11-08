@@ -1,217 +1,223 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { 
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   Plus, 
   Search, 
   MapPin, 
-  Eye, 
-  Users, 
-  Calendar,
-  Edit,
+  DollarSign, 
+  Calendar, 
+  Edit, 
   Trash2,
-  MoreVertical
+  Eye,
+  Briefcase,
+  Clock
 } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
+import { useJobs } from "@/hooks/useJobs";
+import { useJobOperations } from "@/hooks/useJobOperations";
+import { useAuthStore } from "@/stores/authStore";
 import JobPostingModal from "./JobPostingModal";
 
-const InternshipPostingsManagement = () => {
-  const { toast } = useToast();
-  const [isInternshipPostingModalOpen, setIsInternshipPostingModalOpen] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [internshipPostings, setInternshipPostings] = useState([
-    { 
-      id: 1,
-      title: "Product Management Intern", 
-      location: "San Francisco, CA",
-      type: "Full-time",
-      applications: 15, 
-      views: 245, 
-      posted: "2024-01-15",
-      status: "Active",
-      expiresAt: "2024-03-15"
-    },
-    { 
-      id: 2,
-      title: "Junior PM Intern - Summer 2024", 
-      location: "Remote",
-      type: "Full-time",
-      applications: 23, 
-      views: 187, 
-      posted: "2024-01-08",
-      status: "Active",
-      expiresAt: "2024-04-08"
-    },
-    { 
-      id: 3,
-      title: "Associate Product Manager Intern", 
-      location: "New York, NY",
-      type: "Part-time",
-      applications: 9, 
-      views: 156, 
-      posted: "2024-01-20",
-      status: "Draft",
-      expiresAt: "2024-05-20"
-    },
-  ]);
+const JobPostingsManagement = () => {
+  const { user } = useAuthStore();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [activeStatus, setActiveStatus] = useState("active");
+  
+  const { data: jobs = [], isLoading } = useJobs();
+  const { deleteJob, updateJob } = useJobOperations();
 
-  const filteredInternships = internshipPostings.filter(internship =>
-    internship.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    internship.location.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Filter jobs by employer and status
+  const filteredJobs = jobs.filter((job: any) => {
+    const matchesEmployer = job.employer_id === user?.id;
+    const matchesStatus = job.status === activeStatus;
+    const matchesSearch = searchQuery === "" || 
+      job.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      job.location?.toLowerCase().includes(searchQuery.toLowerCase());
+    
+    return matchesEmployer && matchesStatus && matchesSearch;
+  });
 
-  const handleDeleteInternship = (internshipId: number, internshipTitle: string) => {
-    setInternshipPostings(prev => prev.filter(internship => internship.id !== internshipId));
-    toast({
-      title: "PM Internship Deleted",
-      description: `${internshipTitle} has been deleted successfully.`,
-    });
-  };
-
-  const handleToggleStatus = (internshipId: number) => {
-    setInternshipPostings(prev => prev.map(internship => 
-      internship.id === internshipId 
-        ? { ...internship, status: internship.status === "Active" ? "Paused" : "Active" }
-        : internship
-    ));
-    toast({
-      title: "Status Updated",
-      description: "PM internship posting status has been updated.",
-    });
-  };
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "Active": return "bg-green-100 text-green-800";
-      case "Paused": return "bg-yellow-100 text-yellow-800";
-      case "Draft": return "bg-gray-100 text-gray-800";
-      default: return "bg-gray-100 text-gray-800";
+  const handleDelete = async (jobId: string) => {
+    if (window.confirm("Are you sure you want to delete this job posting?")) {
+      await deleteJob(jobId);
     }
   };
 
-  return (
-    <>
-      <div className="space-y-6">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between">
-            <div>
-              <CardTitle>PM Internship Postings Management</CardTitle>
-              <CardDescription>Manage all your product management internship postings and track their performance</CardDescription>
-            </div>
-            <Button onClick={() => setIsInternshipPostingModalOpen(true)}>
-              <Plus className="h-4 w-4 mr-2" />
-              Post New PM Internship
-            </Button>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center space-x-2 mb-6">
-              <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                <Input
-                  placeholder="Search PM internship postings..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10"
-                />
-              </div>
-            </div>
+  const handleStatusChange = async (jobId: string, newStatus: string) => {
+    await updateJob({ id: jobId, status: newStatus as any });
+  };
 
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>PM Internship Title</TableHead>
-                  <TableHead>Location</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Applications</TableHead>
-                  <TableHead>Views</TableHead>
-                  <TableHead>Posted Date</TableHead>
-                  <TableHead>Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredInternships.map((internship) => (
-                  <TableRow key={internship.id}>
-                    <TableCell>
-                      <div>
-                        <div className="font-semibold">{internship.title}</div>
-                        <div className="text-sm text-gray-500">{internship.type}</div>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center">
-                        <MapPin className="h-3 w-3 mr-1" />
-                        {internship.location}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <Badge className={getStatusColor(internship.status)}>
-                        {internship.status}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center">
-                        <Users className="h-3 w-3 mr-1" />
-                        {internship.applications}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center">
-                        <Eye className="h-3 w-3 mr-1" />
-                        {internship.views}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center">
-                        <Calendar className="h-3 w-3 mr-1" />
-                        {new Date(internship.posted).toLocaleDateString()}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center space-x-2">
-                        <Button variant="outline" size="sm">
-                          <Edit className="h-3 w-3" />
-                        </Button>
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          onClick={() => handleToggleStatus(internship.id)}
-                        >
-                          {internship.status === "Active" ? "Pause" : "Activate"}
-                        </Button>
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          onClick={() => handleDeleteInternship(internship.id, internship.title)}
-                        >
-                          <Trash2 className="h-3 w-3" />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </CardContent>
-        </Card>
+  const formatSalary = (min?: number, max?: number, currency?: string) => {
+    if (!min && !max) return "Competitive";
+    const curr = currency || "USD";
+    if (min && max) return `${curr} ${min.toLocaleString()} - ${max.toLocaleString()}`;
+    if (min) return `${curr} ${min.toLocaleString()}+`;
+    return `Up to ${curr} ${max?.toLocaleString()}`;
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-3xl font-bold">Job Postings</h2>
+          <p className="text-muted-foreground">Manage your full-time job positions</p>
+        </div>
+        <Button onClick={() => setIsModalOpen(true)}>
+          <Plus className="h-4 w-4 mr-2" />
+          Post New Job
+        </Button>
       </div>
 
-      <JobPostingModal 
-        isOpen={isInternshipPostingModalOpen} 
-        onClose={() => setIsInternshipPostingModalOpen(false)} 
-      />
-    </>
+      <div className="flex items-center gap-4">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Search jobs by title or location..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-10"
+          />
+        </div>
+      </div>
+
+      <Tabs value={activeStatus} onValueChange={setActiveStatus}>
+        <TabsList>
+          <TabsTrigger value="active">Active</TabsTrigger>
+          <TabsTrigger value="draft">Drafts</TabsTrigger>
+          <TabsTrigger value="paused">Paused</TabsTrigger>
+          <TabsTrigger value="closed">Closed</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value={activeStatus} className="space-y-4 mt-6">
+          {isLoading ? (
+            <Card>
+              <CardContent className="py-8">
+                <p className="text-center text-muted-foreground">Loading jobs...</p>
+              </CardContent>
+            </Card>
+          ) : filteredJobs.length === 0 ? (
+            <Card>
+              <CardContent className="py-8">
+                <p className="text-center text-muted-foreground">
+                  No {activeStatus} jobs found. Create your first job posting!
+                </p>
+              </CardContent>
+            </Card>
+          ) : (
+            filteredJobs.map((job: any) => (
+              <Card key={job.id}>
+                <CardHeader>
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-2">
+                        <CardTitle className="text-xl">{job.title}</CardTitle>
+                        <Badge variant={job.status === 'active' ? 'default' : 'secondary'}>
+                          {job.status}
+                        </Badge>
+                      </div>
+                      <CardDescription className="space-y-2">
+                        <div className="flex items-center gap-4 flex-wrap">
+                          <span className="flex items-center gap-1">
+                            <MapPin className="h-4 w-4" />
+                            {job.location || 'Not specified'}
+                            {job.is_remote && ' (Remote)'}
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <Briefcase className="h-4 w-4" />
+                            {job.job_type?.replace('-', ' ') || 'Full-time'}
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <DollarSign className="h-4 w-4" />
+                            {formatSalary(job.salary_min, job.salary_max, job.salary_currency)}
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <Clock className="h-4 w-4" />
+                            {job.experience_level?.replace('-', ' ') || 'Entry level'}
+                          </span>
+                        </div>
+                      </CardDescription>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
+                    {job.description}
+                  </p>
+                  
+                  {job.skills_required && job.skills_required.length > 0 && (
+                    <div className="flex flex-wrap gap-2 mb-4">
+                      {job.skills_required.slice(0, 5).map((skill: string, index: number) => (
+                        <Badge key={index} variant="outline">
+                          {skill}
+                        </Badge>
+                      ))}
+                      {job.skills_required.length > 5 && (
+                        <Badge variant="outline">+{job.skills_required.length - 5} more</Badge>
+                      )}
+                    </div>
+                  )}
+
+                  <div className="flex items-center justify-between pt-4 border-t">
+                    <div className="text-sm text-muted-foreground">
+                      {job.application_deadline && (
+                        <span className="flex items-center gap-1">
+                          <Calendar className="h-4 w-4" />
+                          Deadline: {new Date(job.application_deadline).toLocaleDateString()}
+                        </span>
+                      )}
+                    </div>
+                    
+                    <div className="flex gap-2">
+                      <Button variant="outline" size="sm">
+                        <Eye className="h-4 w-4 mr-2" />
+                        View
+                      </Button>
+                      <Button variant="outline" size="sm">
+                        <Edit className="h-4 w-4 mr-2" />
+                        Edit
+                      </Button>
+                      {job.status === 'active' && (
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => handleStatusChange(job.id, 'paused')}
+                        >
+                          Pause
+                        </Button>
+                      )}
+                      {job.status === 'paused' && (
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => handleStatusChange(job.id, 'active')}
+                        >
+                          Activate
+                        </Button>
+                      )}
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => handleDelete(job.id)}
+                      >
+                        <Trash2 className="h-4 w-4 mr-2" />
+                        Delete
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))
+          )}
+        </TabsContent>
+      </Tabs>
+
+      <JobPostingModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+    </div>
   );
 };
 
-export default InternshipPostingsManagement;
+export default JobPostingsManagement;

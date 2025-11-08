@@ -185,6 +185,86 @@ export type Database = {
           },
         ]
       }
+      jobs: {
+        Row: {
+          application_deadline: string | null
+          benefits: string[] | null
+          company_id: string | null
+          created_at: string | null
+          description: string
+          employer_id: string | null
+          experience_level: string | null
+          id: string
+          is_remote: boolean | null
+          job_type: string | null
+          location: string | null
+          requirements: string[] | null
+          responsibilities: string[] | null
+          salary_currency: string | null
+          salary_max: number | null
+          salary_min: number | null
+          skills_required: string[] | null
+          start_date: string | null
+          status: string | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          application_deadline?: string | null
+          benefits?: string[] | null
+          company_id?: string | null
+          created_at?: string | null
+          description: string
+          employer_id?: string | null
+          experience_level?: string | null
+          id?: string
+          is_remote?: boolean | null
+          job_type?: string | null
+          location?: string | null
+          requirements?: string[] | null
+          responsibilities?: string[] | null
+          salary_currency?: string | null
+          salary_max?: number | null
+          salary_min?: number | null
+          skills_required?: string[] | null
+          start_date?: string | null
+          status?: string | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          application_deadline?: string | null
+          benefits?: string[] | null
+          company_id?: string | null
+          created_at?: string | null
+          description?: string
+          employer_id?: string | null
+          experience_level?: string | null
+          id?: string
+          is_remote?: boolean | null
+          job_type?: string | null
+          location?: string | null
+          requirements?: string[] | null
+          responsibilities?: string[] | null
+          salary_currency?: string | null
+          salary_max?: number | null
+          salary_min?: number | null
+          skills_required?: string[] | null
+          start_date?: string | null
+          status?: string | null
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "jobs_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       messages: {
         Row: {
           application_id: string | null
